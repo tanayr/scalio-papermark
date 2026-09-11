@@ -1,5 +1,7 @@
 "use client";
 
+import ScalioLogo from "@/components/shared/scalio-logo";
+
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import { signInWithPasskey } from "@teamhanko/passkeys-next-auth-provider/client";
@@ -37,9 +39,7 @@ export default function Login() {
         <div className="z-10 mt-[calc(20vh)] h-fit w-full mx-5 sm:mx-0 max-w-md overflow-hidden rounded-lg">
           <div className="flex flex-col items-center justify-center space-y-3 px-4 py-6 pt-8 text-center sm:px-16">
             <Link href="/">
-              <span className=" text-2xl font-semibold text-gray-800 text-balance ">
-                Scalio data rooms
-              </span>
+              <ScalioLogo width={168} />
             </Link>
             <h3 className="text-sm text-gray-800 text-balance ">
               Sign in to manage your documents and sharing.

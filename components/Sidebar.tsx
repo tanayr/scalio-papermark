@@ -1,3 +1,4 @@
+import ScalioLogo from "./shared/scalio-logo";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import SettingsIcon from "@/components/shared/icons/settings";
@@ -51,6 +52,7 @@ export default function Sidebar() {
               <SidebarComponent className="flex" />
             </SheetContent>
           </Sheet>
+          <a href="/datarooms" className="ml-5" aria-label="Scalio data rooms"><ScalioLogo width={100} /></a>
           <div className="flex flex-1 gap-x-4 self-stretch items-center lg:gap-x-6 justify-end">
             <ProfileMenu size="small" className="mr-3 mt-1.5" />
           </div>
@@ -146,7 +148,7 @@ export const SidebarComponent = ({ className }: { className?: string }) => {
 
         <div className="flex h-16 shrink-0 items-center space-x-3">
           <p className="text-2xl font-bold tracking-tighter text-black dark:text-white flex items-center">
-            Scalio{" "}
+            <ScalioLogo width={132} />
             {userPlan == "pro" ? (
               <span className="bg-background text-foreground ring-1 ring-gray-800 rounded-full px-2.5 py-1 text-xs ml-4">
                 Pro

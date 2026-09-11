@@ -1,5 +1,7 @@
 "use client";
 
+import ScalioLogo from "@/components/shared/scalio-logo";
+
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
@@ -31,9 +33,7 @@ export default function Register() {
       <div className="z-10 mt-[calc(20vh)] h-fit w-full mx-5 sm:mx-0 max-w-md overflow-hidden border border-border bg-gray-50 dark:bg-gray-900 rounded-lg sm:shadow-xl">
         <div className="flex flex-col items-center justify-center space-y-3 px-4 py-6 pt-8 text-center sm:px-16">
           <Link href="/">
-            <span className="text-xl font-bold tracking-tighter text-foreground">
-              Papermark
-            </span>
+            <ScalioLogo width={168} />
           </Link>
           <h3 className="text-2xl text-foreground font-medium">
             Start sharing documents

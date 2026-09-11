@@ -1,3 +1,4 @@
+import ScalioEmailHeader from "./scalio-header";
 import React from "react";
 import {
   Body,
@@ -23,14 +24,12 @@ export default function DataroomViewerInvitation({
 }) {
   return (
     <Html>
-      <Head />
       <Preview>View dataroom on Scalio</Preview>
       <Tailwind>
+        <Head />
         <Body className="bg-white my-auto mx-auto font-sans">
           <Container className="my-10 mx-auto p-5 w-[465px]">
-            <Heading className="text-2xl font-normal text-center p-0 mt-4 mb-8 mx-0">
-              <span className="font-bold tracking-tighter">Scalio</span>
-            </Heading>
+            <ScalioEmailHeader />
             <Heading className="text-xl font-seminbold text-center p-0 mt-4 mb-8 mx-0">
               {`View ${dataroomName}`}
             </Heading>

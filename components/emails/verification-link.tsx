@@ -1,3 +1,4 @@
+import ScalioEmailHeader from "./scalio-header";
 import React from "react";
 import {
   Body,
@@ -19,14 +20,12 @@ const VerificationLinkEmail = ({
 }) => {
   return (
     <Html>
-      <Head />
       <Preview>Your Scalio Login Link</Preview>
       <Tailwind>
+        <Head />
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[500px] rounded border border-solid border-gray-200 px-10 py-5">
-            <Heading className="text-2xl font-normal text-center p-0 mt-4 mb-8 mx-0">
-              <span className="font-bold tracking-tighter">Scalio</span>
-            </Heading>
+            <ScalioEmailHeader />
             <Heading className="mx-0 my-7 p-0 text-center text-xl font-semibold text-black">
               Your Scalio Login Link
             </Heading>

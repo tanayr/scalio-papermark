@@ -50,7 +50,7 @@ export default function EmailSection({
           data-1p-ignore
         />
         <p className="text-sm text-gray-600">
-          This data will be shared with the sender.
+          Contact Aditya or Tanay for access
         </p>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import ScalioLogo from "@/components/shared/scalio-logo";
 import Link from "next/link";
 import { Button } from "../../ui/button";
 import PapermarkSparkle from "../../shared/icons/papermark-sparkle";
@@ -68,9 +69,9 @@ export default function DataroomNav({
 
   return (
     <nav
-      className="bg-black"
+      className="bg-white"
       style={{
-        backgroundColor: brand && brand.brandColor ? brand.brandColor : "black",
+        backgroundColor: brand && brand.brandColor ? brand.brandColor : "#ffffff",
       }}
     >
       <div className="mx-auto px-2 sm:px-6 lg:px-8">
@@ -81,19 +82,13 @@ export default function DataroomNav({
                 <Image
                   className="object-contain"
                   src={brand.logo}
-                  alt="Logo"
+                  alt="Workspace logo"
                   fill
                   quality={100}
                   priority
                 />
               ) : (
-                <Link
-                  href="https://www.papermark.io"
-                  target="_blank"
-                  className="text-2xl font-bold tracking-tighter text-white"
-                >
-                  Papermark
-                </Link>
+                <ScalioLogo width={120} />
               )}
             </div>
             {isDataroom && setDocumentData ? (

@@ -1,3 +1,4 @@
+import ScalioLogo from "@/components/shared/scalio-logo";
 import { useEffect } from "react";
 import PasswordSection from "./password-section";
 import EmailSection from "./email-section";
@@ -44,6 +45,7 @@ export default function AccessForm({
     <>
       <div className="flex h-screen flex-1 flex-col  px-6 py-12 lg:px-8 bg-white">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <ScalioLogo width={144} className="mt-6" />
           <h1 className="mt-10 text-2xl font-bold leading-9 tracking-tight text-gray-950">
             Access the Scalio data room
           </h1>
