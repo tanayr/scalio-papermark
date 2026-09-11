@@ -1,3 +1,11 @@
+# Scalio Investor Room
+
+Scalio's focused, single-room fork of Papermark. Deploy **[self-host/](self-host/README.md)** for the Scalio app.
+
+The deployed runtime uses Papermark v0.12's AGPL data model with a purpose-built interface, private local PDF storage, and verified-email access. It does not run the historical Next.js application or enterprise code. The upstream files below are preserved for provenance; their installation instructions do not apply to the Scalio deployment.
+
+---
+
 <div align="center">
   <h1 align="center">Papermark</h1>
   <h3>The open-source DocSend alternative.</h3>

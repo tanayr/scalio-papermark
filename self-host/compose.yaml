@@ -1,0 +1,78 @@
+name: scalio-invest
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: invest
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?required}
+      POSTGRES_DB: invest
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U invest -d invest']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    mem_limit: 512m
+    networks: [internal]
+    logging:
+      driver: json-file
+      options: { max-size: 10m, max-file: '3' }
+  app:
+    build: .
+    image: scalio/invest:local
+    restart: unless-stopped
+    environment:
+      BASE_URL: ${BASE_URL:?required}
+      ADMIN_EMAILS: ${ADMIN_EMAILS:?required}
+      EMAIL_FROM: ${EMAIL_FROM:?required}
+      RESEND_API_KEY: ${RESEND_API_KEY:?required}
+      AUTH_SECRET: ${AUTH_SECRET:?required}
+      POSTGRES_PRISMA_URL: postgresql://invest:${DB_PASSWORD}@db:5432/invest
+      POSTGRES_PRISMA_URL_NON_POOLING: postgresql://invest:${DB_PASSWORD}@db:5432/invest
+    volumes:
+      - documents:/data/documents
+    ports: ['127.0.0.1:3400:3400']
+    depends_on:
+      db: { condition: service_healthy }
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3400/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    mem_limit: 1536m
+    cpus: 1.5
+    pids_limit: 128
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    networks: [internal, edge]
+    logging:
+      driver: json-file
+      options: { max-size: 10m, max-file: '3' }
+  caddy:
+    image: scalio/secrets-caddy:2.11.4-cloudflare-a8737d0
+    restart: unless-stopped
+    ports: ['8443:443']
+    environment:
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_DNS_TOKEN:?required}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [edge]
+    depends_on: [app]
+    mem_limit: 128m
+    logging:
+      driver: json-file
+      options: { max-size: 10m, max-file: '3' }
+volumes:
+  postgres:
+  documents:
+  caddy_data:
+  caddy_config:
+networks:
+  internal:
+    internal: true
+  edge:

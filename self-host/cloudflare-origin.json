@@ -1,0 +1,22 @@
+{
+  "id": "b70ddce26f3a4e5da5fd42b02e7b9ac5",
+  "name": "Scalio application origins",
+  "phase": "http_request_origin",
+  "rules": [
+    {
+      "action": "route",
+      "action_parameters": {
+        "origin": {
+          "port": 8443
+        }
+      },
+      "description": "Scalio investor room on founder droplet",
+      "enabled": true,
+      "expression": "(http.host eq \"invest.scalio.app\")",
+      "id": "4c89fe233f9a4e65b599dd8b160e678c",
+      "last_updated": "2026-09-11T12:26:36.78722Z",
+      "ref": "4c89fe233f9a4e65b599dd8b160e678c",
+      "version": "1"
+    }
+  ]
+}

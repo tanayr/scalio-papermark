@@ -1,0 +1,9 @@
+[Unit]
+Description=Back up the Scalio investor room
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/scalio-invest/backup.sh
+TimeoutStartSec=10min
