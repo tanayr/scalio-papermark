@@ -42,10 +42,10 @@ export default function AccessForm({
 
   return (
     <>
-      <div className="flex h-screen flex-1 flex-col  px-6 py-12 lg:px-8 bg-black">
+      <div className="flex h-screen flex-1 flex-col  px-6 py-12 lg:px-8 bg-white">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <h1 className="mt-10 text-2xl font-bold leading-9 tracking-tight text-white">
-            Your action is requested to continue
+          <h1 className="mt-10 text-2xl font-bold leading-9 tracking-tight text-gray-950">
+            Access the Scalio data room
           </h1>
         </div>
 
@@ -63,7 +63,7 @@ export default function AccessForm({
                   (requireEmail && !data.email) ||
                   (requirePassword && !data.password)
                 }
-                className="w-1/3 bg-white text-gray-950 hover:bg-white/90"
+                className="w-full bg-[#7BDCAA] text-gray-950 hover:bg-[#6bcc99]"
                 loading={isLoading}
               >
                 Continue

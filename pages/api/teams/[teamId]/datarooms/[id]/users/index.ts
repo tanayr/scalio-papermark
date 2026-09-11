@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { CustomUser } from "@/lib/types";
 import { errorhandler } from "@/lib/errorHandler";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
-import { sendViewerInvitation } from "@/lib/api/notification-helper";
+import { sendDataroomViewerInvite } from "@/lib/emails/send-dataroom-viewer-invite";
 
 export default async function handle(
   req: NextApiRequest,
@@ -62,8 +62,13 @@ export default async function handle(
         return res.status(404).end("Dataroom not found");
       }
 
+      const activeLink = dataroom.links.find(l => !l.isArchived && (!l.expiresAt || l.expiresAt > new Date()));
+      if (!activeLink) return res.status(400).json({message:"Create a sharing link before inviting visitors."});
+      const cleanEmails = [...new Set(emails.map(e => e.trim().toLowerCase()))];
+      if (cleanEmails.length > 50 || cleanEmails.some(e => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e))) return res.status(400).json({message:"Enter valid email addresses (up to 50)."});
+      await prisma.link.update({where:{id:activeLink.id},data:{allowList:[...new Set([...activeLink.allowList,...cleanEmails])]}});
       await prisma.viewer.createMany({
-        data: emails.map((email) => ({
+        data: cleanEmails.map((email) => ({
           email,
           dataroomId,
           invitedAt: new Date(),
@@ -84,17 +89,7 @@ export default async function handle(
         },
       });
 
-      // get linkId from first available dataroom link
-      const linkId = dataroom.links[0].id;
-
-      console.time("sendemail");
-      await sendViewerInvitation({
-        dataroomId,
-        linkId,
-        viewerIds: viewers.map((v) => v.id),
-        senderUserId: (session.user as CustomUser).id,
-      });
-      console.timeEnd("sendemail");
+      for (const email of cleanEmails) await sendDataroomViewerInvite({dataroomName:dataroom.name,senderEmail:(session.user as CustomUser).email || "Scalio",to:email,url:`${process.env.NEXT_PUBLIC_BASE_URL}/view/d/${activeLink.id}`});
 
       return res.status(200).json("Invitation sent!");
     } catch (error) {

@@ -42,7 +42,8 @@ export default function DataroomView({
   token?: string;
   verifiedEmail?: string;
 }) {
-  const { linkType, dataroom, emailProtected, password: linkPassword } = link;
+  const { linkType, emailProtected, password: linkPassword } = link;
+  const [dataroom, setDataroom] = useState(link.dataroom);
 
   const plausible = usePlausible();
   const analytics = useAnalytics();
@@ -103,6 +104,7 @@ export default function DataroomView({
 
     if (response.ok) {
       const fetchData = await response.json();
+      if (fetchData.dataroom) setDataroom(fetchData.dataroom);
 
       if (fetchData.type === "email-verification") {
         setVerificationRequested(true);

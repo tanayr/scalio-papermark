@@ -1,0 +1,8 @@
+.git
+node_modules
+.next
+.env*
+self-host/node_modules
+self-host/data
+self-host/test-output
+*.tsbuildinfo

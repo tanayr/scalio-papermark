@@ -10,11 +10,11 @@ export const sendVerificationRequestEmail = async (params: {
   try {
     await sendEmail({
       to: email as string,
-      subject: "Welcome to Papermark!",
+      subject: "Your Scalio sign-in link",
       react: emailTemplate,
       test: process.env.NODE_ENV === "development",
     });
   } catch (e) {
-    console.error(e);
+    throw e;
   }
 };

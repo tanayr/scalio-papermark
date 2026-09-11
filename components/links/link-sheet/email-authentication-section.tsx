@@ -61,20 +61,7 @@ export default function EmailAuthenticationSection({
             )}
           </h2>
         </div>
-        <Switch
-          checked={enabled}
-          onClick={
-            hasFreePlan
-              ? () =>
-                  handleUpgradeStateChange(
-                    true,
-                    "link_sheet_email_auth_section",
-                  )
-              : undefined
-          }
-          className={hasFreePlan ? "opacity-50" : undefined}
-          onCheckedChange={hasFreePlan ? undefined : handleEnableAuthentication}
-        />
+        <span className="text-xs text-muted-foreground">Required</span>
       </div>
     </div>
   );

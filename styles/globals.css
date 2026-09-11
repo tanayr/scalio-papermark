@@ -76,3 +76,9 @@
     @apply bg-background text-foreground;
   }
 }
+@font-face{font-family:Scalio;src:url('/fonts/hanken-grotesk-latin.woff2') format('woff2');font-weight:100 900;font-display:swap;}
+:root{--background:0 0% 100%;--foreground:60 5% 9%;--primary:145 40% 67%;--primary-foreground:60 5% 9%;--secondary:85 26% 91%;--accent:85 26% 91%;--ring:145 74% 38%;--radius:.2rem;}
+body{font-family:Scalio,Arial,sans-serif;background:#fff;}
+h1,h2{font-weight:400!important;letter-spacing:-.025em;}
+aside{background:#fff!important;border-right:1px solid #e5e9e2;}
+aside button.bg-gray-200{background:#d3e4d0;}

@@ -40,7 +40,7 @@ export default function EmailProtectionSection({
             Require email to view
           </h2>
         </div>
-        <Switch checked={enabled} onCheckedChange={handleEnableProtection} />
+        <span className="text-xs text-muted-foreground">Required</span>
       </div>
     </div>
   );

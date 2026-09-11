@@ -1,0 +1,53 @@
+import assert from 'node:assert/strict';
+import {PrismaClient} from '@prisma/client';
+import {encode} from 'next-auth/jwt';
+import {randomBytes,createHash} from 'node:crypto';
+import {readFile,writeFile} from 'node:fs/promises';
+const env=JSON.parse(await readFile('/tmp/scalio-papermark-test-env.json','utf8'));
+assert.equal(new URL(env.POSTGRES_PRISMA_URL).hostname,'localhost');assert.ok(env.POSTGRES_PRISMA_URL.endsWith('_test'));
+const db=new PrismaClient({datasources:{db:{url:env.POSTGRES_PRISMA_URL}}});
+const base=env.NEXTAUTH_URL;const teamId='scalio-invest';
+const user=await db.user.findUniqueOrThrow({where:{email:'tanay@scalio.app'}});
+const jwt=await encode({token:{sub:user.id,email:user.email,user:{id:user.id,email:user.email,name:user.name}},secret:env.NEXTAUTH_SECRET,maxAge:3600});
+const admin=`next-auth.session-token=${jwt}`;
+async function req(route,method='GET',body,cookie){const headers={Origin:base};if(cookie)headers.Cookie=cookie;if(body&&!Buffer.isBuffer(body))headers['Content-Type']='application/json';return fetch(base+route,{method,headers,body:body?Buffer.isBuffer(body)?body:JSON.stringify(body):undefined,redirect:'manual'});}
+async function json(route,method,body,cookie=admin){const r=await req(route,method,body,cookie);assert.ok(r.ok,`${route}: ${r.status} ${await r.clone().text()}`);return r.json();}
+function pdf(){const objects=['<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids [3 0 R] /Count 1 >>','<< /Type /Page /Parent 2 0 R /MediaBox [0 0 400 500] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'];const stream='BT /F1 22 Tf 40 440 Td (Scalio test document) Tj ET';objects.push(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);let text='%PDF-1.4\n';const offsets=[0];objects.forEach((o,i)=>{offsets.push(Buffer.byteLength(text));text+=`${i+1} 0 obj\n${o}\nendobj\n`;});const start=Buffer.byteLength(text);text+=`xref\n0 6\n0000000000 65535 f \n${offsets.slice(1).map(n=>String(n).padStart(10,'0')+' 00000 n ').join('\n')}\ntrailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${start}\n%%EOF\n`;return Buffer.from(text);}
+try{
+ assert.equal((await req('/api/teams')).status,401);
+ const teams=await json('/api/teams');assert.ok(teams.some(t=>t.id===teamId));
+ const roomA=await json(`/api/teams/${teamId}/datarooms`,'POST',{name:'Scalio · Fundraise'});
+ const roomB=await json(`/api/teams/${teamId}/datarooms`,'POST',{name:'Scalio · Company documents'});
+ assert.notEqual(roomA.id,roomB.id);console.log('PASS: original admin API creates multiple data rooms');
+ const upload=await json(`/api/file/local?teamId=${teamId}`,'POST',pdf());
+ const doc=await json(`/api/teams/${teamId}/documents`,'POST',{name:'Scalio test.pdf',url:upload.data,storageType:upload.type});
+ const version=await db.documentVersion.findFirstOrThrow({where:{documentId:doc.id,isPrimary:true}});assert.equal(version.numPages,1);assert.equal(version.hasPages,true);
+ await json(`/api/teams/${teamId}/datarooms/${roomA.id}/documents`,'POST',{documentId:doc.id});
+ console.log('PASS: PDF upload, local rendering, and add document to room');
+ const settings={name:'Investor access',targetId:roomA.id,linkType:'DATAROOM_LINK',allowList:['investor@example.com'],denyList:[],allowDownload:false,emailProtected:true,emailAuthenticated:true,enableNotification:false};
+ const link=await json('/api/links','POST',settings);
+ const publicMeta=await json(`/api/links/${link.id}/dataroom`,'GET',null,null);assert.equal(publicMeta.link.dataroom.documents.length,0);assert.equal(publicMeta.link.password,null);
+ const body={linkId:link.id,dataroomId:roomA.id,viewType:'DATAROOM_VIEW',email:'investor@example.com'};
+ assert.equal((await req('/api/views-dataroom','POST',{...body,email:'outsider@example.com'})).status,403);
+ const token=randomBytes(32).toString('hex');await db.verificationToken.create({data:{token:createHash('sha256').update(token).digest('hex'),identifier:`${link.id}:investor@example.com`,expires:new Date(Date.now()+60000)}});
+ const verified=await req('/api/views-dataroom','POST',{...body,token,verifiedEmail:'investor@example.com'});assert.equal(verified.status,200,await verified.clone().text());const viewer=verified.headers.get('set-cookie').split(';')[0];const roomView=await verified.json();assert.equal(roomView.dataroom.documents[0].id,doc.id);
+ assert.equal((await req('/api/views-dataroom','POST',{...body,token})).status,401);
+ const dv=await json('/api/views-dataroom','POST',{...body,viewType:'DOCUMENT_VIEW',documentId:doc.id,dataroomViewId:roomView.viewId},viewer);assert.equal(dv.pages.length,1);
+ assert.equal((await req(dv.pages[0].file)).status,403);assert.equal((await req(dv.pages[0].file,'GET',null,viewer)).status,200);
+ assert.equal((await req(`/api/file/local?key=${encodeURIComponent(upload.data)}&linkId=${link.id}`,'GET',null,viewer)).status,403);
+ const other=await json('/api/links','POST',{...settings,targetId:roomB.id});
+ assert.equal((await req('/api/views-dataroom','POST',{...body,linkId:other.id,viewType:'DOCUMENT_VIEW',documentId:doc.id},viewer)).status!==200,true);
+ console.log('PASS: verified-email access, token replay denied, room isolation and preview-only access');
+ await json('/api/record_view','POST',{linkId:link.id,documentId:doc.id,viewId:dv.viewId,dataroomId:roomA.id,duration:2300,pageNumber:1,versionNumber:1},viewer);
+ const stats=await json(`/api/teams/${teamId}/datarooms/${roomA.id}/stats`);assert.equal(stats.total_duration,2300);
+ await json(`/api/links/${link.id}`,'PUT',{...settings,allowDownload:true});const download=await json('/api/links/download','POST',{linkId:link.id,viewId:dv.viewId},viewer);assert.equal((await req(download.downloadUrl,'GET',null,viewer)).status,200);
+ await json(`/api/links/${link.id}`,'PUT',{...settings,allowList:['someone-else@example.com']});assert.equal((await req(dv.pages[0].file,'GET',null,viewer)).status,403);
+ await json(`/api/links/${link.id}`,'PUT',{...settings,expiresAt:new Date(0)});assert.equal((await req('/api/views-dataroom','POST',body,viewer)).status,404);
+ await json(`/api/links/${link.id}`,'PUT',settings);await json(`/api/links/${link.id}/archive`,'PUT',{isArchived:true});assert.equal((await req(dv.pages[0].file,'GET',null,viewer)).status,403);
+ await json(`/api/links/${link.id}/archive`,'PUT',{isArchived:false});
+ console.log('PASS: local visitor analytics, download setting, email removal, expiry, and link revocation');
+ const loginToken=randomBytes(32).toString('hex');await db.verificationToken.create({data:{token:createHash('sha256').update(loginToken+env.NEXTAUTH_SECRET).digest('hex'),identifier:user.email,expires:new Date(Date.now()+3600000)}});
+ await writeFile('/tmp/scalio-papermark-browser-url.txt',`${base}/api/auth/callback/email?token=${loginToken}&email=${encodeURIComponent(user.email)}&callbackUrl=${encodeURIComponent(base+'/datarooms')}`,{mode:0o600});
+ await writeFile('/tmp/scalio-papermark-fixtures.json',JSON.stringify({roomA,roomB,link,doc,viewer}),{mode:0o600});
+ console.log('All integration checks passed; synthetic local fixtures ready for browser review.');
+}finally{await db.$disconnect();}

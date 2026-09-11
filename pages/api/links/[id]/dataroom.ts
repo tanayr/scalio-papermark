@@ -105,7 +105,14 @@ export default async function handle(
         return acc;
       }, new Date(0));
 
-      return res.status(200).json({ link, brand, lastUpdatedAt });
+      if (!link.dataroom || link.expiresAt && link.expiresAt <= new Date()) return res.status(404).end();
+      link.password = link.password ? "protected" : null;
+      link.emailProtected = true;
+      link.emailAuthenticated = true;
+      link.dataroom.documents = [];
+      link.dataroom.folders = [];
+      res.setHeader("Cache-Control", "private, no-store");
+      return res.status(200).json({ link, brand: brand || {logo:"/scalio-logo.png",brandColor:"#ffffff"}, lastUpdatedAt });
     } catch (error) {
       return res.status(500).json({
         message: "Internal Server Error",

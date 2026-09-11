@@ -24,12 +24,12 @@ export default function DataroomViewerInvitation({
   return (
     <Html>
       <Head />
-      <Preview>View dataroom on Papermark</Preview>
+      <Preview>View dataroom on Scalio</Preview>
       <Tailwind>
         <Body className="bg-white my-auto mx-auto font-sans">
           <Container className="my-10 mx-auto p-5 w-[465px]">
             <Heading className="text-2xl font-normal text-center p-0 mt-4 mb-8 mx-0">
-              <span className="font-bold tracking-tighter">Papermark</span>
+              <span className="font-bold tracking-tighter">Scalio</span>
             </Heading>
             <Heading className="text-xl font-seminbold text-center p-0 mt-4 mb-8 mx-0">
               {`View ${dataroomName}`}
@@ -38,7 +38,7 @@ export default function DataroomViewerInvitation({
             <Text className="text-sm leading-6 text-black">
               You have been invited to view the{" "}
               <span className="font-semibold">{dataroomName}</span> dataroom on{" "}
-              <span className="font-semibold">Papermark</span>.
+              <span className="font-semibold">Scalio</span>.
               <br />
               The invitation was sent by{" "}
               <span className="font-semibold">{senderEmail}</span>.
@@ -56,17 +56,17 @@ export default function DataroomViewerInvitation({
               or copy and paste this URL into your browser: <br />
               {`${url}`}
             </Text>
-            <Text className="text-sm text-gray-400">Papermark</Text>
+            <Text className="text-sm text-gray-400">Scalio</Text>
             <Hr />
             <Section className="mt-8 text-gray-400">
               <Text className="text-xs">
                 © {new Date().getFullYear()}{" "}
                 <a
-                  href="https://www.papermark.io"
+                  href="https://invest.scalio.app"
                   className="no-underline text-gray-400 hover:text-gray-400 visited:text-gray-400"
                   target="_blank"
                 >
-                  papermark.io
+                  invest.scalio.app
                 </a>
               </Text>
               <Text className="text-xs">

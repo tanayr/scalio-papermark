@@ -1,8 +1,8 @@
-# Scalio Investor Room
+# Scalio data rooms
 
-Scalio's focused, single-room fork of Papermark. Deploy **[self-host/](self-host/README.md)** for the Scalio app.
+Scalio's self-hosted fork of Papermark v0.12.0, retaining the original admin and viewer UI with multiple data rooms, folders, email-restricted links, download controls, and visitor analytics.
 
-The deployed runtime uses Papermark v0.12's AGPL data model with a purpose-built interface, private local PDF storage, and verified-email access. It does not run the historical Next.js application or enterprise code. The upstream files below are preserved for provenance; their installation instructions do not apply to the Scalio deployment.
+Use **[deploy/README.md](deploy/README.md)** for the Scalio deployment. The initial custom Express implementation in `self-host/` is retained for rollback only. The original upstream README follows for attribution and historical context.
 
 ---
 

@@ -1,3 +1,4 @@
+import { viewerSession } from "@/lib/self-host-access";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
 
@@ -19,6 +20,9 @@ export default async function handle(
     type: string;
   };
 
+  const accessView = await prisma.view.findUnique({where:{id:String(viewId||"")},include:{link:true}});
+  const accessSession = accessView && await viewerSession(req,accessView.link);
+  if(!accessSession || accessSession.email !== accessView?.viewerEmail) return res.status(403).end();
   try {
     const reaction = await prisma.reaction.create({
       data: {

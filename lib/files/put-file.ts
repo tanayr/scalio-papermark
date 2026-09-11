@@ -20,6 +20,11 @@ export const putFile = async ({
   teamId: string;
   docId?: string;
 }) => {
+  if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === "local") {
+    const response = await fetch(`/api/file/local?teamId=${encodeURIComponent(teamId)}`, { method:"POST", body:file, headers:{"Content-Type":"application/pdf"} });
+    if (!response.ok) throw new Error((await response.json()).message || "Upload failed");
+    return { ...(await response.json()), numPages: undefined };
+  }
   const NEXT_PUBLIC_UPLOAD_TRANSPORT = process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT;
 
   const { type, data, numPages } = await match(NEXT_PUBLIC_UPLOAD_TRANSPORT)

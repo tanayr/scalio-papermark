@@ -18,7 +18,7 @@ export default function PasswordSection({
       <div className="rounded-md shadow-sm space-y-2">
         <label
           htmlFor="password"
-          className="block text-sm font-medium leading-6 text-white"
+          className="block text-sm font-medium leading-6 text-gray-950"
         >
           Passcode
         </label>
@@ -29,7 +29,7 @@ export default function PasswordSection({
             type={showPassword ? "text" : "password"}
             autoCorrect="off"
             autoComplete="off"
-            className="flex w-full rounded-md border-0 py-1.5 text-white bg-black shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-300 sm:text-sm sm:leading-6"
+            className="flex w-full rounded-md border-0 py-1.5 text-gray-950 bg-white shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-300 sm:text-sm sm:leading-6"
             value={password || ""}
             placeholder="Enter passcode"
             onChange={(e) => {

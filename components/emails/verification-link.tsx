@@ -13,26 +13,26 @@ import {
 } from "@react-email/components";
 
 const VerificationLinkEmail = ({
-  url = "https://www.papermark.io",
+  url = "https://invest.scalio.app",
 }: {
   url: string;
 }) => {
   return (
     <Html>
       <Head />
-      <Preview>Your Papermark Login Link</Preview>
+      <Preview>Your Scalio Login Link</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[500px] rounded border border-solid border-gray-200 px-10 py-5">
             <Heading className="text-2xl font-normal text-center p-0 mt-4 mb-8 mx-0">
-              <span className="font-bold tracking-tighter">Papermark</span>
+              <span className="font-bold tracking-tighter">Scalio</span>
             </Heading>
             <Heading className="mx-0 my-7 p-0 text-center text-xl font-semibold text-black">
-              Your Papermark Login Link
+              Your Scalio Login Link
             </Heading>
 
             <Text className="text-sm leading-6 text-black">
-              Welcome to Papermark!
+              Welcome to Scalio!
             </Text>
             <Text className="text-sm leading-6 text-black">
               Please click the magic link below to sign in to your account.

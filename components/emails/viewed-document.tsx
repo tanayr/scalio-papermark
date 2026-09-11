@@ -30,7 +30,7 @@ export default function ViewedDocument({
         <Body className="bg-white my-auto mx-auto font-sans">
           <Container className="my-10 mx-auto p-5 w-[465px]">
             <Heading className="text-2xl font-normal text-center p-0 mt-4 mb-8 mx-0">
-              <span className="font-bold tracking-tighter">Papermark</span>
+              <span className="font-bold tracking-tighter">Scalio</span>
             </Heading>
             <Heading className="mx-0 my-7 p-0 text-center text-xl font-semibold text-black">
               New Document Visitor
@@ -46,30 +46,30 @@ export default function ViewedDocument({
             </Text>
             <Text className="text-sm leading-6 text-black">
               You can get the detailed engagement insights like time-spent per
-              page and total duration for this document on Papermark.
+              page and total duration for this document on Scalio.
             </Text>
             <Section className="my-8 text-center">
               <Button
                 className="bg-black rounded text-white text-xs font-semibold no-underline text-center"
-                href={`https://www.papermark.io/documents/${documentId}`}
+                href={`https://invest.scalio.app/documents/${documentId}`}
                 style={{ padding: "12px 20px" }}
               >
                 See my document insights
               </Button>
             </Section>
             <Text className="text-sm leading-6 text-black">
-              Stay informed, stay ahead with Papermark.
+              Stay informed, stay ahead with Scalio.
             </Text>
             <Hr />
             <Section className="mt-8 text-gray-400">
               <Text className="text-xs">
                 © {new Date().getFullYear()}{" "}
                 <a
-                  href="https://www.papermark.io"
+                  href="https://invest.scalio.app"
                   className="no-underline text-gray-400 hover:text-gray-400 visited:text-gray-400"
                   target="_blank"
                 >
-                  papermark.io
+                  invest.scalio.app
                 </a>
               </Text>
               <Text className="text-xs">

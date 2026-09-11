@@ -1,3 +1,6 @@
+import { rm } from "node:fs/promises";
+import path from "node:path";
+import { localPath } from "@/lib/local-storage";
 import { match } from "ts-pattern";
 
 import { DocumentStorageType } from "@prisma/client";
@@ -12,6 +15,7 @@ export type DeleteFileOptions = {
 };
 
 export const deleteFile = async ({ type, data }: DeleteFileOptions) => {
+  if (type === DocumentStorageType.LOCAL_PATH) { await rm(path.dirname(localPath(data)),{recursive:true,force:true}); return; }
   return await match(type)
     .with(DocumentStorageType.S3_PATH, async () =>
       deleteAllFilesFromS3Server(data),

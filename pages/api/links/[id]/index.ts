@@ -92,7 +92,13 @@ export default async function handle(
         brand = null;
       }
 
-      return res.status(200).json({ link, brand });
+      if (!link.document || link.expiresAt && link.expiresAt <= new Date()) return res.status(404).end();
+      link.password = link.password ? "protected" : null;
+      link.emailProtected = true;
+      link.emailAuthenticated = true;
+      link.document.versions.forEach(v => { v.file = ""; });
+      res.setHeader("Cache-Control", "private, no-store");
+      return res.status(200).json({ link, brand: brand || {logo:"/scalio-logo.png",brandColor:"#ffffff"} });
     } catch (error) {
       return res.status(500).json({
         message: "Internal Server Error",
@@ -113,14 +119,15 @@ export default async function handle(
     const dataroomLink = linkType === "DATAROOM_LINK";
     const documentLink = linkType === "DOCUMENT_LINK";
 
-    const hashedPassword =
-      password && password.length > 0 ? await hashPassword(password) : null;
+    const previousLink = await prisma.link.findUnique({where:{id}});
+    if (!previousLink) return res.status(404).end();
+    const hashedPassword = password === previousLink.password ? previousLink.password : password && password.length > 0 ? await hashPassword(password) : null;
     const exat = expiresAt ? new Date(expiresAt) : null;
 
     let { domain, slug, ...linkData } = linkDomainData;
 
     // set domain and slug to null if the domain is papermark.io
-    if (domain && domain === "papermark.io") {
+    if (domain && (domain === "papermark.io" || domain === "invest.scalio.app")) {
       domain = null;
       slug = null;
     }
@@ -174,8 +181,8 @@ export default async function handle(
         dataroomId: dataroomLink ? targetId : null,
         password: hashedPassword,
         name: linkData.name || null,
-        emailProtected: linkData.emailProtected,
-        emailAuthenticated: linkData.emailAuthenticated,
+        emailProtected: true,
+        emailAuthenticated: true,
         allowDownload: linkData.allowDownload,
         allowList: linkData.allowList,
         denyList: linkData.denyList,
@@ -223,10 +230,6 @@ export default async function handle(
     if (!updatedLink) {
       return res.status(404).json({ error: "Link not found" });
     }
-
-    await fetch(
-      `${process.env.NEXTAUTH_URL}/api/revalidate?secret=${process.env.REVALIDATE_TOKEN}&linkId=${id}&hasDomain=${updatedLink.domainId ? "true" : "false"}`,
-    );
 
     return res.status(200).json(updatedLink);
   } else if (req.method == "DELETE") {

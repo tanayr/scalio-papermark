@@ -15,7 +15,7 @@ import Google from "@/components/shared/icons/google";
 import { Label } from "@/components/ui/label";
 
 export default function Login() {
-  const { next } = useParams as { next?: string };
+  const next = "/datarooms";
 
   const [isLoginWithEmail, setIsLoginWithEmail] = useState<boolean>(false);
   const [isLoginWithGoogle, setIsLoginWithGoogle] = useState<boolean>(false);
@@ -38,11 +38,11 @@ export default function Login() {
           <div className="flex flex-col items-center justify-center space-y-3 px-4 py-6 pt-8 text-center sm:px-16">
             <Link href="/">
               <span className=" text-2xl font-semibold text-gray-800 text-balance ">
-                Welcome to Papermark
+                Scalio data rooms
               </span>
             </Link>
             <h3 className="text-sm text-gray-800 text-balance ">
-              Share documents. Not attachments.
+              Sign in to manage your documents and sharing.
             </h3>
           </div>
           <form
@@ -104,114 +104,11 @@ export default function Login() {
               {emailButtonText}
             </Button>
           </form>
-          <p className="text-center py-4">or</p>
-          <div className="flex flex-col px-4 sm:px-16 space-y-2">
-            <Button
-              onClick={() => {
-                setIsLoginWithGoogle(true);
-                signIn("google", {
-                  ...(next && next.length > 0 ? { callbackUrl: next } : {}),
-                }).then((res) => {
-                  if (res?.status) {
-                    setIsLoginWithGoogle(false);
-                  }
-                });
-              }}
-              disabled={isLoginWithGoogle}
-              className="flex justify-center items-center space-x-2  font-normal bg-gray-100 text-gray-900 border border-gray-200 hover:bg-gray-200 "
-            >
-              {isLoginWithGoogle ? (
-                <Loader className="w-5 h-5 mr-2 animate-spin" />
-              ) : (
-                <Google className="w-5 h-5" />
-              )}
-              <span>Continue with Google</span>
-            </Button>
-            <Button
-              onClick={() => {
-                setIsLoginWithLinkedIn(true);
-                signIn("linkedin", {
-                  ...(next && next.length > 0 ? { callbackUrl: next } : {}),
-                }).then((res) => {
-                  if (res?.status) {
-                    setIsLoginWithLinkedIn(false);
-                  }
-                });
-              }}
-              disabled={isLoginWithLinkedIn}
-              className="flex justify-center items-center space-x-2 font-normal bg-gray-100 text-gray-900 border border-gray-200 hover:bg-gray-200"
-            >
-              {isLoginWithLinkedIn ? (
-                <Loader className="w-5 h-5 mr-2 animate-spin " />
-              ) : (
-                <LinkedIn />
-              )}
-              <span>Continue with LinkedIn</span>
-            </Button>
-            <Button
-              onClick={() =>
-                signInWithPasskey({
-                  tenantId: process.env.NEXT_PUBLIC_HANKO_TENANT_ID as string,
-                })
-              }
-              variant="outline"
-              className="flex justify-center items-center space-x-2 border border-gray-200 hover:bg-gray-200  font-normal bg-gray-100 text-gray-900 hover:text-gray-900"
-            >
-              <Passkey className="w-4 h-4 " />
-              <span>Continue with a passkey</span>
-            </Button>
-          </div>
-          <p className=" mt-10 text-xs text-muted-foreground w-full max-w-md px-4 sm:px-16">
-            By clicking continue, you acknowledge that you have read and agree
-            to Papermark&apos;s{" "}
-            <Link href="/terms" className="underline">
-              Terms of Service
-            </Link>{" "}
-            and{" "}
-            <Link href="/privacy" className="underline">
-              Privacy Policy
-            </Link>
-            .
-          </p>
+          <p className="mt-8 px-4 sm:px-16 text-sm text-muted-foreground">Administrator access. Investors should use the room link shared with them.</p>
+          <p className="mt-5 px-4 sm:px-16 text-xs text-muted-foreground">Powered by <a href="https://github.com/tanayr/scalio-papermark" className="underline">Papermark · source code</a></p>
         </div>
       </div>
-      <div className="hidden w-full justify-center bg-gray-800 md:flex md:w-1/2 lg:w-3/5">
-        <div className="flex w-full max-w-5xl px-4 md:px-8 py-20">
-          <div
-            className="flex w-full mx-auto max-w-5xl px-4 md:px-8 py-20 bg-gray-800 rounded-3xl  justify-center"
-            id="features"
-          >
-            <div className="flex flex-col items-center">
-              {/* Image container */}
-              <div className="w-64 h-64 mb-4">
-                <img
-                  className="object-cover w-full h-full rounded-2xl shadow-2xl"
-                  src="https://www.papermark.io/_static/testimonials/jaski.jpeg"
-                  alt="Jaski"
-                />
-              </div>
-              {/* Text content */}
-              <div className="max-w-xl text-center">
-                <blockquote className="text-l leading-8 text-gray-100 sm:text-xl sm:leading-9 text-balance">
-                  <p>
-                    True builders listen to their users and build what they
-                    need. Thanks Papermark team for solving a big pain point.
-                    DocSend monopoly will end soon!
-                  </p>
-                </blockquote>
-                <figcaption className="mt-4">
-                  <div className="font-semibold text-white text-balance ">
-                    Jaski
-                  </div>
-                  <div className="text-gray-400 text-balance ">
-                    Founder, Townhall Network
-                  </div>
-                </figcaption>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div className="hidden md:flex flex-1 items-center justify-center bg-[#E9EEE2] p-16"><h1 className="text-6xl font-normal leading-tight">A closer look<br/><span className="text-[#19AA57]">at what&apos;s next.</span></h1></div>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import Footer from "@/components/web/footer";
 import Navbar from "@/components/web/navbar";
 import { Metadata } from "next";

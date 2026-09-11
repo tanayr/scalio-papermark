@@ -1,3 +1,4 @@
+import { processLocalVersion } from "@/lib/local-storage";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import prisma from "@/lib/prisma";
@@ -129,7 +130,7 @@ export default async function handle(
           ownerId: (session.user as CustomUser).id,
           teamId: teamId,
           links: {
-            create: {},
+            create: {emailAuthenticated:true,allowList:(process.env.ADMIN_EMAILS || "").split(","),denyList:[],enableNotification:false},
           },
           versions: {
             create: {
@@ -149,18 +150,7 @@ export default async function handle(
         },
       });
 
-      // skip triggering convert-pdf-to-image job for "notion" documents
-      if (type !== "notion") {
-        // trigger document uploaded event to trigger convert-pdf-to-image job
-        await client.sendEvent({
-          id: document.versions[0].id, // unique eventId for the run
-          name: "document.uploaded",
-          payload: {
-            documentVersionId: document.versions[0].id,
-            teamId: teamId,
-          },
-        });
-      }
+      if (type !== "notion") await processLocalVersion(document.versions[0].id);
 
       return res.status(201).json(document);
     } catch (error) {

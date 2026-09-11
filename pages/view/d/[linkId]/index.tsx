@@ -35,12 +35,12 @@ export interface LinkWithDataroom extends Link {
   };
 }
 
-export const getStaticProps = async (context: GetStaticPropsContext) => {
+export const getServerSideProps = async (context: GetStaticPropsContext) => {
   const { linkId } = context.params as { linkId: string };
 
   // Fetch the link
   const res = await fetch(
-    `${process.env.NEXTAUTH_URL}/api/links/${linkId}/dataroom`,
+    `${process.env.INTERNAL_BASE_URL || process.env.NEXTAUTH_URL}/api/links/${linkId}/dataroom`,
   );
 
   if (!res.ok) {
@@ -95,16 +95,9 @@ export const getStaticProps = async (context: GetStaticPropsContext) => {
       },
       brand, // pass brand to the client
     },
-    revalidate: 10,
+
   };
 };
-
-export async function getStaticPaths() {
-  return {
-    paths: [],
-    fallback: true,
-  };
-}
 
 export default function ViewPage({
   link,

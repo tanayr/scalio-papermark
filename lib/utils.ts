@@ -398,6 +398,11 @@ export const convertDataUrlToFile = ({
 };
 
 export const uploadImage = async (file: File) => {
+  if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === "local") {
+    const response=await fetch("/api/file/brand",{method:"POST",body:file});
+    if(!response.ok) throw new Error("Image upload failed");
+    return (await response.json()).url as string;
+  }
   const newBlob = await upload(file.name, file, {
     access: "public",
     handleUploadUrl: "/api/file/logo-upload",

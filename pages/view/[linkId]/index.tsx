@@ -13,11 +13,11 @@ import { Brand } from "@prisma/client";
 import CustomMetatag from "@/components/view/custom-metatag";
 import Head from "next/head";
 
-export const getStaticProps = async (context: GetStaticPropsContext) => {
+export const getServerSideProps = async (context: GetStaticPropsContext) => {
   const { linkId } = context.params as { linkId: string };
 
   // Fetch the link
-  const res = await fetch(`${process.env.NEXTAUTH_URL}/api/links/${linkId}`);
+  const res = await fetch(`${process.env.INTERNAL_BASE_URL || process.env.NEXTAUTH_URL}/api/links/${linkId}`);
   if (!res.ok) {
     return { notFound: true };
   }
@@ -76,16 +76,9 @@ export const getStaticProps = async (context: GetStaticPropsContext) => {
       brand, // pass brand to the client
       showPoweredByBanner: teamPlan === "free",
     },
-    revalidate: brand ? 10 : false,
+
   };
 };
-
-export async function getStaticPaths() {
-  return {
-    paths: [],
-    fallback: true,
-  };
-}
 
 export default function ViewPage({
   link,

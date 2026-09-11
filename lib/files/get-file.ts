@@ -14,7 +14,7 @@ export const getFile = async ({
   data,
   isDownload = false,
 }: GetFileOptions) => {
-  console.log("type", type);
+  if (type === DocumentStorageType.LOCAL_PATH) return `/api/file/local?key=${encodeURIComponent(data)}${isDownload ? "&download=1" : ""}`;
 
   const url = await match(type)
     .with(DocumentStorageType.VERCEL_BLOB, () => {
@@ -25,7 +25,7 @@ export const getFile = async ({
       }
     })
     .with(DocumentStorageType.S3_PATH, async () => getFileFromS3(data))
-    .exhaustive();
+    .otherwise(() => { throw new Error("Unsupported storage"); });
 
   return url;
 };

@@ -48,18 +48,18 @@ export default function DomainSection({
       <Label htmlFor="link-domain">Domain</Label>
       <div className="flex">
         <select
-          value={data.domain || "papermark.io"}
+          value={data.domain || "invest.scalio.app"}
           onChange={handleDomainChange}
           onFocus={handleSelectFocus}
           className={cn(
             "w-full rounded-l-md border border-r-0 border-border bg-secondary px-5 text-sm text-secondary-foreground focus:border-border focus:outline-none focus:ring-0",
-            data.domain && data.domain !== "papermark.io"
+            data.domain && data.domain !== "invest.scalio.app"
               ? ""
               : "rounded-r-md border-r-1",
           )}
         >
-          <option key="papermark.io" value="papermark.io">
-            papermark.io
+          <option key="invest.scalio.app" value="invest.scalio.app">
+            invest.scalio.app
           </option>
           {linkType === "DOCUMENT_LINK" ? (
             <>
@@ -73,7 +73,7 @@ export default function DomainSection({
           ) : null}
         </select>
 
-        {data.domain && data.domain !== "papermark.io" ? (
+        {data.domain && data.domain !== "invest.scalio.app" ? (
           <input
             type="text"
             name="key"
@@ -97,7 +97,7 @@ export default function DomainSection({
             autoComplete="off"
             className={cn(
               "hidden w-full rounded-r-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-input placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-gray-400 sm:text-sm sm:leading-6",
-              data.domain && data.domain !== "papermark.io" ? "flex" : "",
+              data.domain && data.domain !== "invest.scalio.app" ? "flex" : "",
             )}
             placeholder="deck"
             onChange={(e) => {
@@ -118,7 +118,7 @@ export default function DomainSection({
         ) : null}
       </div>
 
-      {data.domain && data.domain !== "papermark.io" && !isDomainVerified ? (
+      {data.domain && data.domain !== "invest.scalio.app" && !isDomainVerified ? (
         <div className="text-sm text-red-500 mt-4">
           Your domain is not verified yet!{" "}
           <Link

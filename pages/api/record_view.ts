@@ -1,3 +1,5 @@
+import prisma from "@/lib/prisma";
+import { viewerSession } from "@/lib/self-host-access";
 import { NextApiRequest, NextApiResponse } from "next";
 import { newId } from "@/lib/id-helper";
 import { publishPageView } from "@/lib/tinybird";
@@ -73,6 +75,10 @@ export default async function handle(
     versionNumber: number;
   };
 
+  const link = await prisma.link.findUnique({where:{id:linkId}});
+  const session = link && await viewerSession(req,link);
+  const view = session && await prisma.view.findFirst({where:{id:viewId,linkId,documentId,viewerEmail:session.email}});
+  if (!view || !Number.isInteger(duration) || duration < 0 || duration > 3600000) return res.status(403).end();
   const time = Date.now(); // in milliseconds
 
   const pageViewId = newId("view");

@@ -1,87 +1,20 @@
-import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
-import AppMiddleware from "@/lib/middleware/app";
-import DomainMiddleware from "@/lib/middleware/domain";
-import { BLOCKED_PATHNAMES } from "./lib/constants";
-import PostHogMiddleware from "./lib/middleware/posthog";
-
-function isAnalyticsPath(path: string) {
-  // Create a regular expression
-  // ^ - asserts position at start of the line
-  // /ingest/ - matches the literal string "/ingest/"
-  // .* - matches any character (except for line terminators) 0 or more times
-  const pattern = /^\/ingest\/.*/;
-
-  return pattern.test(path);
-}
-
-export const config = {
-  matcher: [
-    /*
-     * Match all paths except for:
-     * 1. /api/ routes
-     * 2. /_next/ (Next.js internals)
-     * 3. /_static (inside /public)
-     * 4. /_vercel (Vercel internals)
-     * 5. /favicon.ico, /sitemap.xml (static files)
-     */
-    "/((?!api/|_next/|_static|_vercel|favicon.ico|sitemap.xml).*)",
-  ],
-};
-
-export default async function middleware(req: NextRequest, ev: NextFetchEvent) {
-  const path = req.nextUrl.pathname;
-  const host = req.headers.get("host");
-
-  if (isAnalyticsPath(path)) {
-    return PostHogMiddleware(req);
-  }
-
-  if (
-    (process.env.NODE_ENV === "development" && host?.includes(".local")) ||
-    (process.env.NODE_ENV !== "development" &&
-      !(
-        host?.includes("localhost") ||
-        host?.includes("papermark.io") ||
-        host?.endsWith(".vercel.app")
-      ))
-  ) {
-    return DomainMiddleware(req);
-  }
-
-  if (
-    path !== "/" &&
-    path !== "/v1" &&
-    path !== "/register" &&
-    path !== "/privacy" &&
-    path !== "/terms" &&
-    path !== "/oss-friends" &&
-    path !== "/pricing" &&
-    path !== "/docsend-alternatives" &&
-    path !== "/data-room" &&
-    path !== "/launch-week" &&
-    path !== "/open-source-investors" &&
-    path !== "/investors" &&
-    path !== "/ai" &&
-    path !== "/share-notion-page" &&
-    !path.startsWith("/alternatives") &&
-    !path.startsWith("/solutions") &&
-    !path.startsWith("/investors") &&
-    !path.startsWith("/blog") &&
-    !path.startsWith("/view/")
-  ) {
-    return AppMiddleware(req);
-  }
-
-  const url = req.nextUrl.clone();
-
-  if (
-    path.startsWith("/view/") &&
-    (BLOCKED_PATHNAMES.some((blockedPath) => path.includes(blockedPath)) ||
-      path.includes("."))
-  ) {
-    url.pathname = "/404";
-    return NextResponse.rewrite(url, { status: 404 });
-  }
-
-  return NextResponse.next();
+import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
+export const config = { matcher: ["/((?!_next/static|_next/image|pdf.worker.min.mjs|favicon.ico|favicon.svg|_static/|fonts/|scalio-logo.png).*)"] };
+export default async function middleware(req: NextRequest) {
+ const path = req.nextUrl.pathname;
+ const publicApi = (req.method==="GET" && path==="/api/file/brand") || path.startsWith("/api/auth/") || ["/api/record_reaction", "/api/feedback", "/api/health", "/api/views", "/api/views-dataroom", "/api/record_view", "/api/links/download", "/api/file/local"].includes(path) || (req.method === "GET" && /^\/api\/links\/[^/]+(?:\/dataroom)?$/.test(path));
+ if (publicApi || path.startsWith("/view/") && !path.endsWith("/chat") || path === "/login") return NextResponse.next();
+ const token = await getToken({req, secret: process.env.NEXTAUTH_SECRET});
+ const admins = (process.env.ADMIN_EMAILS || "").toLowerCase().split(",").map(x=>x.trim());
+ if (!token?.email || !admins.includes(token.email.toLowerCase())) {
+  if (path.startsWith("/api/")) return NextResponse.json({message:"Unauthorized"},{status:401});
+  return NextResponse.redirect(new URL("/login", req.url));
+ }
+ if (path.startsWith("/api/") && !["GET","HEAD","OPTIONS"].includes(req.method)) {
+  const origin = req.headers.get("origin");
+  if (origin && origin !== new URL(process.env.NEXTAUTH_URL!).origin) return NextResponse.json({message:"Invalid origin"},{status:403});
+ }
+ if (path === "/" || path === "/admin" || path === "/welcome") return NextResponse.redirect(new URL("/datarooms",req.url));
+ return NextResponse.next();
 }

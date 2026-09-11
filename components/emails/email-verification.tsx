@@ -14,7 +14,7 @@ import {
 } from "@react-email/components";
 
 export default function EmailVerification({
-  verificationURL = "papermark.io",
+  verificationURL = "invest.scalio.app",
   email = "test@test.com",
 }: {
   verificationURL: string;
@@ -28,7 +28,7 @@ export default function EmailVerification({
         <Body className="bg-white my-auto mx-auto font-sans">
           <Container className="my-10 mx-auto p-5 w-[465px]">
             <Heading className="text-2xl font-normal text-center p-0 mt-4 mb-8 mx-0">
-              <span className="font-bold tracking-tighter">Papermark</span>
+              <span className="font-bold tracking-tighter">Scalio</span>
             </Heading>
             <Heading className="mx-0 my-7 p-0 text-center text-xl font-semibold text-black">
               Please verify your email
@@ -56,11 +56,11 @@ export default function EmailVerification({
               <Text className="text-xs">
                 © {new Date().getFullYear()}{" "}
                 <a
-                  href="https://www.papermark.io"
+                  href="https://invest.scalio.app"
                   className="no-underline text-gray-400 hover:text-gray-400 visited:text-gray-400"
                   target="_blank"
                 >
-                  papermark.io
+                  invest.scalio.app
                 </a>
               </Text>
               <Text className="text-xs">

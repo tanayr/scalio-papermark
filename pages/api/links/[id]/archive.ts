@@ -42,10 +42,6 @@ export default async function handle(
         return res.status(404).json({ error: "Link not found" });
       }
 
-      await fetch(
-        `${process.env.NEXTAUTH_URL}/api/revalidate?secret=${process.env.REVALIDATE_TOKEN}&linkId=${id}&hasDomain=${updatedLink.domainId ? "true" : "false"}`,
-      );
-
       return res.status(200).json(updatedLink);
     } catch (error) {
       errorhandler(error, res);

@@ -15,6 +15,6 @@ export const sendVerificationEmail = async (
       system: true,
     });
   } catch (e) {
-    console.error(e);
+    throw e;
   }
 };

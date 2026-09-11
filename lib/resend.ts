@@ -28,13 +28,8 @@ export const sendEmail = async ({
 
   try {
     const { data, error } = await resend.emails.send({
-      from: marketing
-        ? "Marc from Papermark <marc@ship.papermark.io>"
-        : system
-          ? "Papermark <system@papermark.io>"
-          : "Marc from Papermark <marc@papermark.io>",
+      from: process.env.EMAIL_FROM || "Scalio <notifications@scalio.app>",
       to: test ? "delivered@resend.dev" : to,
-      reply_to: marketing ? "marc@papermark.io" : undefined,
       subject,
       react,
       headers: {

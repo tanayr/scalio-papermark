@@ -146,7 +146,7 @@ export const SidebarComponent = ({ className }: { className?: string }) => {
 
         <div className="flex h-16 shrink-0 items-center space-x-3">
           <p className="text-2xl font-bold tracking-tighter text-black dark:text-white flex items-center">
-            Papermark{" "}
+            Scalio{" "}
             {userPlan == "pro" ? (
               <span className="bg-background text-foreground ring-1 ring-gray-800 rounded-full px-2.5 py-1 text-xs ml-4">
                 Pro

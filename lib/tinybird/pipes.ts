@@ -1,47 +1,18 @@
-import { z } from "zod";
-
-import { Tinybird } from "@chronark/zod-bird";
-
-const tb = new Tinybird({ token: process.env.TINYBIRD_TOKEN! });
-
-export const getTotalAvgPageDuration = tb.buildPipe({
-  pipe: "get_total_average_page_duration__v5",
-  parameters: z.object({
-    documentId: z.string(),
-    excludedLinkIds: z.array(z.string()),
-    excludedViewIds: z.array(z.string()),
-    since: z.number(),
-  }),
-  data: z.object({
-    versionNumber: z.number().int(),
-    pageNumber: z.string(),
-    avg_duration: z.number(),
-  }),
-});
-
-export const getViewPageDuration = tb.buildPipe({
-  pipe: "get_page_duration_per_view__v5",
-  parameters: z.object({
-    documentId: z.string(),
-    viewId: z.string(),
-    since: z.number(),
-  }),
-  data: z.object({
-    pageNumber: z.string(),
-    sum_duration: z.number(),
-  }),
-});
-
-export const getTotalDataroomDuration = tb.buildPipe({
-  pipe: "get_total_dataroom_duration__v1",
-  parameters: z.object({
-    dataroomId: z.string(),
-    excludedLinkIds: z.array(z.string()),
-    excludedViewIds: z.array(z.string()),
-    since: z.number(),
-  }),
-  data: z.object({
-    viewId: z.string(),
-    sum_duration: z.number(),
-  }),
-});
+// Same interface as the upstream analytics pipes, backed by local Postgres.
+import prisma from '@/lib/prisma';
+type Filter={excludedLinkIds:string[];excludedViewIds:string[];since:number};
+const filters=(p:Filter)=>({linkId:{notIn:p.excludedLinkIds},viewId:{notIn:p.excludedViewIds},time:{gte:new Date(p.since)}});
+export async function getTotalAvgPageDuration(p:Filter & {documentId:string}) {
+ const totals=await prisma.pageEvent.groupBy({by:['versionNumber','pageNumber','viewId'],where:{documentId:p.documentId,...filters(p)},_sum:{duration:true}});
+ const groups=new Map<string,{versionNumber:number;pageNumber:string;sum:number;count:number}>();
+ for(const r of totals){const key=`${r.versionNumber}:${r.pageNumber}`;const g=groups.get(key)||{versionNumber:r.versionNumber,pageNumber:r.pageNumber,sum:0,count:0};g.sum+=r._sum.duration||0;g.count++;groups.set(key,g);}
+ return {data:Array.from(groups.values()).map(g=>({versionNumber:g.versionNumber,pageNumber:g.pageNumber,avg_duration:g.sum/g.count})).sort((a,b)=>a.versionNumber-b.versionNumber || Number(a.pageNumber)-Number(b.pageNumber))};
+}
+export async function getViewPageDuration(p:{documentId:string;viewId:string;since:number}){
+ const data=await prisma.pageEvent.groupBy({by:['pageNumber'],where:{documentId:p.documentId,viewId:p.viewId,time:{gte:new Date(p.since)}},_sum:{duration:true}});
+ return {data:data.map(r=>({pageNumber:r.pageNumber,sum_duration:r._sum.duration||0}))};
+}
+export async function getTotalDataroomDuration(p:Filter & {dataroomId:string}){
+ const data=await prisma.pageEvent.groupBy({by:['viewId'],where:{dataroomId:p.dataroomId,...filters(p)},_sum:{duration:true}});
+ return {data:data.map(r=>({viewId:r.viewId,sum_duration:r._sum.duration||0}))};
+}

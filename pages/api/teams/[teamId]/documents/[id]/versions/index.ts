@@ -1,3 +1,4 @@
+import { processLocalVersion } from "@/lib/local-storage";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import prisma from "@/lib/prisma";
@@ -81,17 +82,7 @@ export default async function handle(
         },
       });
 
-      // trigger document uploaded event to trigger convert-pdf-to-image job
-      await client.sendEvent({
-        id: version.id,
-        name: "document.uploaded",
-        payload: {
-          documentVersionId: version.id,
-          versionNumber: version.versionNumber,
-          documentId: documentId,
-          teamId: teamId,
-        },
-      });
+      await processLocalVersion(version.id);
 
       res.status(200).json({ id: documentId });
     } catch (error) {
