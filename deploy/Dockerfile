@@ -14,6 +14,7 @@ ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3400 HOSTNAME=0.0.0.0
 COPY --from=build --chown=node:node /app/.next/standalone ./
 COPY --from=build --chown=node:node /app/.next/static ./.next/static
 COPY --from=build --chown=node:node /app/public ./public
+COPY --from=build --chown=node:node /app/node_modules/mupdf/lib/mupdf-wasm.wasm ./node_modules/mupdf/lib/mupdf-wasm.wasm
 COPY --from=build --chown=node:node /opt/prisma-cli /opt/prisma-cli
 COPY --from=build --chown=node:node /app/deploy ./deploy
 RUN mkdir -p /data/documents && chown node:node /data/documents
