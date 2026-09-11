@@ -6,7 +6,7 @@ The runtime uses Node 24, Next 15, Postgres, local private PDF storage, Poppler 
 
 Build from the repository root: `docker build -f deploy/Dockerfile -t scalio/invest:papermark .`.
 
-Apply migrations with `node node_modules/prisma/build/index.js migrate deploy --schema=deploy/prisma/schema.prisma`, then `node deploy/bootstrap.mjs`. This migration directory preserves the already-deployed baseline checksum. Do not use the historical root Prisma migration directory against the Scalio database.
+Apply migrations with `node /opt/prisma-cli/node_modules/prisma/build/index.js migrate deploy --schema=deploy/prisma/schema.prisma`, then `node deploy/bootstrap.mjs`. This migration directory preserves the already-deployed baseline checksum. Do not use the historical root Prisma migration directory against the Scalio database.
 
 Required runtime variables: `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `NEXT_PUBLIC_BASE_URL`, `INTERNAL_BASE_URL`, `ADMIN_EMAILS`, `EMAIL_FROM`, `RESEND_API_KEY`, `POSTGRES_PRISMA_URL`, `POSTGRES_PRISMA_URL_NON_POOLING`. Set `NEXT_PUBLIC_UPLOAD_TRANSPORT=local`. Build-time public URL is invest.scalio.app. The document volume mounts at `/data/documents`.
 
