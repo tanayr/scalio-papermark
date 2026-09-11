@@ -107,8 +107,6 @@ export default async function handle(
 
       if (!link.dataroom || link.expiresAt && link.expiresAt <= new Date()) return res.status(404).end();
       link.password = link.password ? "protected" : null;
-      link.emailProtected = true;
-      link.emailAuthenticated = true;
       link.dataroom.documents = [];
       link.dataroom.folders = [];
       res.setHeader("Cache-Control", "private, no-store");

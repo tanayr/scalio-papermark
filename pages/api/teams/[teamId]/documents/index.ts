@@ -130,7 +130,7 @@ export default async function handle(
           ownerId: (session.user as CustomUser).id,
           teamId: teamId,
           links: {
-            create: {emailAuthenticated:true,allowList:(process.env.ADMIN_EMAILS || "").split(","),denyList:[],enableNotification:false},
+            create: {emailProtected:true,emailAuthenticated:false,allowList:[],denyList:[],enableNotification:false},
           },
           versions: {
             create: {

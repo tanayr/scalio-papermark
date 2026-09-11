@@ -10,7 +10,7 @@ Apply migrations with `node /opt/prisma-cli/node_modules/prisma/build/index.js m
 
 Required runtime variables: `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `NEXT_PUBLIC_BASE_URL`, `INTERNAL_BASE_URL`, `ADMIN_EMAILS`, `EMAIL_FROM`, `RESEND_API_KEY`, `POSTGRES_PRISMA_URL`, `POSTGRES_PRISMA_URL_NON_POOLING`. Set `NEXT_PUBLIC_UPLOAD_TRANSPORT=local`. Build-time public URL is invest.scalio.app. The document volume mounts at `/data/documents`.
 
-The two configured administrators sign in using emailed links. Every visitor verifies their email. Sharing links support allowed/blocked email addresses and domains, passwords, expiry, download controls, and revocation. New links initially allow the administrators; use the link settings or Invite Visitors to grant access. Room contents and PDF previews are checked against the live link settings. Original PDF download is blocked when downloads are disabled.
+The two configured administrators sign in using emailed links. Each sharing link can allow access without email, collect an email without verification, or require email verification. Sharing links support allowed/blocked email addresses and domains, passwords, expiry, download controls, and revocation. New links default to collecting an email without verification or an allowlist. Existing links retain their saved settings. Allowed/blocked email lists use verified-email access; use the link settings or Invite Visitors to manage access. Room contents and PDF previews are checked against the live link settings. Original PDF download is blocked when downloads are disabled.
 
 PDF uploads: maximum 30 MB at the proxy, 300 pages. All pages render before an upload is reported complete. Keep the existing daily database/document backup timer. Backups remain on the same droplet.
 

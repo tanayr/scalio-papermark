@@ -22,7 +22,9 @@ export default function EmailProtectionSection({
     setData({
       ...data,
       emailProtected: updatedEmailProtection,
-      emailAuthenticated: !updatedEmailProtection && false,
+      emailAuthenticated: updatedEmailProtection ? data.emailAuthenticated : false,
+      allowList: updatedEmailProtection ? data.allowList : [],
+      denyList: updatedEmailProtection ? data.denyList : [],
     });
     setEnabled(updatedEmailProtection);
   };
@@ -40,7 +42,7 @@ export default function EmailProtectionSection({
             Require email to view
           </h2>
         </div>
-        <span className="text-xs text-muted-foreground">Required</span>
+        <Switch aria-label="Require email to view" checked={enabled} onCheckedChange={handleEnableProtection} />
       </div>
     </div>
   );

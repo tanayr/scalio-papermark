@@ -61,7 +61,7 @@ export default function EmailAuthenticationSection({
             )}
           </h2>
         </div>
-        <span className="text-xs text-muted-foreground">Required</span>
+        <Switch aria-label="Require email verification" checked={enabled} onCheckedChange={handleEnableAuthentication} />
       </div>
     </div>
   );

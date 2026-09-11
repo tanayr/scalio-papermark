@@ -94,8 +94,6 @@ export default async function handle(
 
       if (!link.document || link.expiresAt && link.expiresAt <= new Date()) return res.status(404).end();
       link.password = link.password ? "protected" : null;
-      link.emailProtected = true;
-      link.emailAuthenticated = true;
       link.document.versions.forEach(v => { v.file = ""; });
       res.setHeader("Cache-Control", "private, no-store");
       return res.status(200).json({ link, brand: brand || {logo:"/scalio-logo.png",brandColor:"#ffffff"} });
@@ -181,8 +179,8 @@ export default async function handle(
         dataroomId: dataroomLink ? targetId : null,
         password: hashedPassword,
         name: linkData.name || null,
-        emailProtected: true,
-        emailAuthenticated: true,
+        emailProtected: Boolean(linkData.emailProtected || linkData.emailAuthenticated),
+        emailAuthenticated: Boolean(linkData.emailAuthenticated),
         allowDownload: linkData.allowDownload,
         allowList: linkData.allowList,
         denyList: linkData.denyList,
