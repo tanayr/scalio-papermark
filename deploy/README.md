@@ -22,4 +22,6 @@ On a document’s overview, use **Mobile version** to upload a portrait PDF and 
 
 Shared document and data-room links select the enabled mobile PDF when opened below 768 CSS pixels wide. The selection stays fixed during that document view, including rotation. Missing or disabled mobile PDFs fall back to desktop. Access settings apply to both PDFs. Downloads follow the viewed PDF; visitors must reopen a document after it is replaced. Analytics label mobile and desktop separately and use the page count recorded when the view began.
 
+The compact mobile PDF viewer hides the header and shows the current/total page count between bottom previous/next buttons. Swipe left to advance or right to go back. The background around PDFs is `#f7f4ee`; enabled reactions appear above the mobile navigation. Desktop keeps its header. See [the changelog](../CHANGELOG.md) for release history.
+
 Run `node deploy/mobile-pdf-test.mjs [path-to-mobile.pdf]` against the local test server configured in `/tmp/scalio-papermark-test-env.json`. The test rejects non-local/non-test databases. It covers mobile uploads, fallbacks, permissions, analytics, downloads, replacement/removal, and desktop revision changes.
