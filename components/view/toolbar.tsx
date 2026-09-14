@@ -80,11 +80,11 @@ export default function Toolbar({
   return (
     <>
       <div
-        className="fixed top-16 left-0 w-dvw justify-center items-end flex z-10"
+        className="pointer-events-none fixed top-16 left-0 w-dvw justify-center items-end flex z-10"
         style={{ height: "calc(100vh - 64px)" }}
       >
         <Draggable bounds="parent" handle=".moveable-icon">
-          <div className="bg-gray-950/40 rounded-full w-max mt-4 mb-4">
+          <div className="pointer-events-auto bg-gray-950/40 rounded-full w-max mt-4 mb-4">
             <div className="grid items-center justify-start">
               <div className="px-2 py-1">
                 <div className="grid items-center justify-start grid-flow-col">

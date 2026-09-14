@@ -74,6 +74,29 @@ export default function PagesViewer({
   const startTimeRef = useRef(Date.now());
   const pageNumberRef = useRef<number>(pageNumber);
   const visibilityRef = useRef<boolean>(true);
+  const swipeStartRef = useRef<{ id: number; x: number; y: number; page: number } | null>(null);
+
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    swipeStartRef.current = null;
+    if (event.touches.length !== 1 || (window.visualViewport?.scale ?? 1) > 1) return;
+    if ((event.target as Element).closest("button, a, input, textarea, select, [role='button']")) return;
+    const touch = event.touches[0];
+    swipeStartRef.current = { id: touch.identifier, x: touch.clientX, y: touch.clientY, page: pageNumber };
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    const start = swipeStartRef.current;
+    swipeStartRef.current = null;
+    if (!start || event.touches.length || start.page !== pageNumber || (window.visualViewport?.scale ?? 1) > 1) return;
+    const touch = Array.from(event.changedTouches).find(touch => touch.identifier === start.id);
+    if (!touch) return;
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+    // Require a deliberate horizontal swipe; taps and vertical gestures do not turn pages.
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (dx < 0) goToNextPage();
+    else goToPreviousPage();
+  };
 
   // Update the previous page number after the effect hook has run
   useEffect(() => {
@@ -259,7 +282,11 @@ export default function PagesViewer({
 
         <div
           className="flex justify-center mx-auto relative h-full w-full"
+          style={{ touchAction: "pan-y pinch-zoom" }}
           onContextMenu={handleContextMenu}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={() => { swipeStartRef.current = null; }}
         >
           {pageNumber <= numPages &&
             (pages && loadedImages[pageNumber - 1] ? (
