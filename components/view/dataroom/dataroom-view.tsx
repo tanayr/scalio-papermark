@@ -238,7 +238,7 @@ export default function DataroomView({
         />
       </div>
     ) : viewData.pages ? (
-      <div className="min-h-dvh bg-gray-950">
+      <div className="min-h-dvh" style={{ backgroundColor: "#f7f4ee" }}>
         <PagesViewer
           key={viewData.viewId}
           variant={viewData.variant}

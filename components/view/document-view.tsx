@@ -172,7 +172,7 @@ export default function DocumentView({
     );
   }
   return (
-    <div className="min-h-dvh bg-gray-950">
+    <div className="min-h-dvh" style={{ backgroundColor: "#f7f4ee" }}>
       {submitted ? (
         <ViewData
           link={link}
