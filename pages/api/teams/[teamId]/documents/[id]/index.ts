@@ -127,6 +127,7 @@ export default async function handle(
             select: {
               id: true,
               file: true,
+              mobileFile: true,
               type: true,
               storageType: true,
             },
@@ -143,6 +144,7 @@ export default async function handle(
         // delete the files from storage
         for (const version of documentVersions.versions) {
           await deleteFile({ type: version.storageType, data: version.file });
+          if (version.mobileFile) await deleteFile({ type: "LOCAL_PATH", data: version.mobileFile });
         }
       }
 

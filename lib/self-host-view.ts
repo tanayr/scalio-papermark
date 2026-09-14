@@ -2,6 +2,7 @@ import { sendViewedDocumentEmail } from "@/lib/emails/send-viewed-document";
 import { permit } from "@/lib/self-host-rate";
 import { NextApiRequest,NextApiResponse } from 'next';
 import prisma from '@/lib/prisma';
+import { selectDocumentVariant } from '@/lib/document-variant';
 import { authorizeViewer,localFileUrl } from '@/lib/self-host-access';
 export default async function handle(req:NextApiRequest,res:NextApiResponse){
  res.setHeader('Cache-Control','private, no-store');
@@ -24,13 +25,16 @@ export default async function handle(req:NextApiRequest,res:NextApiResponse){
  if(link.dataroomId && !await prisma.dataroomDocument.findUnique({where:{dataroomId_documentId:{dataroomId:link.dataroomId,documentId}}}))return res.status(403).json({message:'Document is not in this room.'});
  const version=await prisma.documentVersion.findFirst({where:{documentId,isPrimary:true},orderBy:{versionNumber:'desc'},include:{pages:{orderBy:{pageNumber:'asc'}}}});
  if(!version || !version.hasPages)return res.status(409).json({message:'Document preview is not ready.'});
+ const variant=selectDocumentVariant(version,req.body.preferMobile===true);
+ const pages=version.pages.filter(page=>page.variant===variant);
+ const file=variant==='MOBILE'?version.mobileFile!:version.file;
  let dataroomViewId:string|undefined;
  if(link.dataroomId && req.body.dataroomViewId){const parent=await prisma.view.findFirst({where:{id:req.body.dataroomViewId,linkId:link.id,viewerEmail:email,viewType:'DATAROOM_VIEW'}});dataroomViewId=parent?.id;}
- const view=await prisma.view.create({data:{linkId:link.id,documentId,dataroomId:link.dataroomId,dataroomViewId,viewerEmail:email,verified,viewerId}});
+ const view=await prisma.view.create({data:{linkId:link.id,documentId,dataroomId:link.dataroomId,dataroomViewId,viewerEmail:email,verified,viewerId,documentVersionId:version.id,versionNumber:version.versionNumber,variant,numPages:pages.length,file}});
  if(link.enableNotification && permit(`notify:${link.id}:${email}`,3)) {
   const document=await prisma.document.findUnique({where:{id:documentId},include:{owner:true}});
   if(document) await sendViewedDocumentEmail({ownerEmail:document.owner.email,documentId,documentName:document.name,viewerEmail:email});
  }
- return res.json({viewId:view.id,file:null,notionData:null,pages:version.pages.map(page=>({pageNumber:page.pageNumber,file:localFileUrl(page.file,link.id),embeddedLinks:page.embeddedLinks}))});
+ return res.json({viewId:view.id,file:null,notionData:null,variant,versionNumber:version.versionNumber,pages:pages.map(page=>({pageNumber:page.pageNumber,file:localFileUrl(page.file,link.id),embeddedLinks:page.embeddedLinks}))});
  }catch(e){console.error('Viewer request failed',e instanceof Error?e.message:'');return res.status(500).json({message:'Unable to open the document. Please try again.'});}
 }

@@ -29,7 +29,8 @@ export const getFileForDocumentPage = async (
 
   const documentPage = await prisma.documentPage.findUnique({
     where: {
-      pageNumber_versionId: {
+      pageNumber_versionId_variant: {
+          variant: "DESKTOP",
         pageNumber: pageNumber,
         versionId: documentVersion.id,
       },

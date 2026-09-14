@@ -17,6 +17,7 @@ const bodyValidation = z.object({
   viewId: z.string(),
   dataroomId: z.string().nullable().optional(),
   versionNumber: z.number().int().optional(),
+  variant: z.enum(["DESKTOP", "MOBILE"]),
   time: z.number().int(),
   duration: z.number().int(),
   pageNumber: z.string(),
@@ -79,6 +80,7 @@ export default async function handle(
   const session = link && await viewerSession(req,link);
   const view = session && await prisma.view.findFirst({where:{id:viewId,linkId,documentId,viewerEmail:session.email}});
   if (!view || !Number.isInteger(duration) || duration < 0 || duration > 3600000) return res.status(403).end();
+  if (!Number.isInteger(pageNumber) || pageNumber < 1 || (view.numPages && pageNumber > view.numPages)) return res.status(400).end();
   const time = Date.now(); // in milliseconds
 
   const pageViewId = newId("view");
@@ -88,8 +90,9 @@ export default async function handle(
     linkId,
     documentId,
     viewId,
-    dataroomId: dataroomId || null,
-    versionNumber: versionNumber || 1,
+    dataroomId: view.dataroomId,
+    versionNumber: view.versionNumber ?? versionNumber ?? 1,
+    variant: view.variant,
     time,
     duration,
     pageNumber: pageNumber.toString(),

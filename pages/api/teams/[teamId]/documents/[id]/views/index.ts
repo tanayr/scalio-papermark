@@ -144,8 +144,9 @@ export default async function handle(
       const viewsWithDuration = limitedViews?.map(
         (view: any, index: number) => {
           // calculate the completion rate
-          const completionRate = numPages
-            ? (durations[index].data.length / numPages) * 100
+          const viewedPages = view.numPages ?? numPages;
+          const completionRate = viewedPages
+            ? Math.min(100, (durations[index].data.length / viewedPages) * 100)
             : 0;
 
           return {

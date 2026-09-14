@@ -157,6 +157,10 @@ model DocumentVersion {
   numPages      Int? // This should be a reference to the number of pages in the document
   isPrimary     Boolean             @default(false) // Indicates if this is the primary version
   fileId        String? // This is the file ID of the OpenAI File API
+  mobileFile    String?
+  mobileName    String?
+  mobileNumPages Int?
+  mobileEnabled Boolean @default(false)
   pages         DocumentPage[]
   hasPages      Boolean             @default(false) // Indicates if the document has pages
   createdAt     DateTime            @default(now())
@@ -170,6 +174,7 @@ model DocumentPage {
   id            String              @id @default(cuid())
   version       DocumentVersion     @relation(fields: [versionId], references: [id], onDelete: Cascade)
   versionId     String
+  variant       DocumentVariant @default(DESKTOP)
   pageNumber    Int // e.g., 1, 2, 3 for
   embeddedLinks String[]
   file          String // This should be a reference to where the file / page is stored (S3, Google Cloud Storage, etc.)
@@ -177,8 +182,13 @@ model DocumentPage {
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
 
-  @@unique([pageNumber, versionId])
+  @@unique([pageNumber, versionId, variant])
   @@index([versionId])
+}
+
+enum DocumentVariant {
+  DESKTOP
+  MOBILE
 }
 
 enum DocumentStorageType {
@@ -260,6 +270,11 @@ model View {
   dataroomViewId   String? // This is the view ID from the dataroom
   viewerEmail      String? // Email of the viewer if known
   verified         Boolean           @default(false) // Whether the viewer email has been verified
+  documentVersionId String?
+  versionNumber    Int?
+  variant          DocumentVariant @default(DESKTOP)
+  numPages         Int?
+  file             String?
   viewedAt         DateTime          @default(now())
   downloadedAt     DateTime? // This is the time the document was downloaded
   reactions        Reaction[]
@@ -493,6 +508,7 @@ model PageEvent {
  documentId String
  viewId String
  dataroomId String?
+ variant DocumentVariant @default(DESKTOP)
  versionNumber Int @default(1)
  time DateTime
  duration Int

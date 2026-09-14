@@ -23,7 +23,7 @@ export default function StatsChart({
     return <StatsChartSkeleton className="my-8" />;
   }
 
-  let durationData = Array.from({ length: totalPagesMax }, (_, i) => ({
+  let durationData: import("../charts/utils").Data[] = Array.from({ length: totalPagesMax }, (_, i) => ({
     pageNumber: (i + 1).toString(),
     data: [
       {
@@ -44,12 +44,13 @@ export default function StatsChart({
       if (pageIndex !== -1) {
         // If page exists in the initialized array, update its data
         const versionIndex = durationData[pageIndex].data.findIndex(
-          (v) => v.versionNumber === dataItem.versionNumber,
+          (v) => v.versionNumber === dataItem.versionNumber && (v.variant ?? "DESKTOP") === (dataItem.variant ?? "DESKTOP"),
         );
         if (versionIndex === -1) {
           // If this version number doesn't exist, add it
           durationData[pageIndex].data.push({
             versionNumber: dataItem.versionNumber,
+            variant: dataItem.variant,
             avg_duration: dataItem.avg_duration,
           });
         } else {
@@ -66,6 +67,7 @@ export default function StatsChart({
           data: [
             {
               versionNumber: dataItem.versionNumber,
+            variant: dataItem.variant,
               avg_duration: dataItem.avg_duration,
             },
           ],

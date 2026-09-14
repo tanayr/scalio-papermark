@@ -2,6 +2,7 @@ export type Data = {
   pageNumber: string;
   data: {
     versionNumber: number;
+    variant?: "DESKTOP" | "MOBILE";
     avg_duration: number;
   }[];
 };
@@ -72,13 +73,13 @@ export const getColors = (versionNumbers: string[]): Color[] => {
     "rose",
   ];
   return versionNumbers.map((versionNumber: string) => {
-    const versionIndex = parseInt(versionNumber.split(" ")[1]) - 1;
+    const versionIndex = (parseInt(versionNumber.split(" ")[1]) - 1) * 2 + (versionNumber.includes("Mobile") ? 1 : 0);
     return colorArray[versionIndex % colorArray.length] as Color;
   });
 };
 
 export const getColorForVersion = (versionNumber: string): Color => {
-  const versionIndex = parseInt(versionNumber.split(" ")[1]) - 1;
+  const versionIndex = (parseInt(versionNumber.split(" ")[1]) - 1) * 2 + (versionNumber.includes("Mobile") ? 1 : 0);
   const colorArray = [
     "emerald",
     "teal",

@@ -23,7 +23,7 @@ export default async function handler(req:NextApiRequest,res:NextApiResponse){
  }
  if(req.method!=='GET')return res.status(405).end();
  const key=String(req.query.key||'');const file=localPath(key);
- const version=await prisma.documentVersion.findFirst({where:{OR:[{file:key},{pages:{some:{file:key}}}]},include:{document:true}});
+ const version=await prisma.documentVersion.findFirst({where:{OR:[{file:key},{mobileFile:key},{pages:{some:{file:key}}}]},include:{document:true,pages:{where:{file:key},select:{variant:true}}}});
  if(!version) return res.status(404).end();
  const member=userId && version.document.teamId && await prisma.userTeam.findUnique({where:{userId_teamId:{userId,teamId:version.document.teamId}}});
  if(!member) {
@@ -31,9 +31,11 @@ export default async function handler(req:NextApiRequest,res:NextApiResponse){
   if(!link || !await viewerSession(req,link))return res.status(403).end();
   const inScope=link.documentId===version.documentId || link.dataroomId && await prisma.dataroomDocument.findUnique({where:{dataroomId_documentId:{dataroomId:link.dataroomId,documentId:version.documentId}}});
   if(!inScope || !version.isPrimary || key.endsWith('.pdf') && !link.allowDownload)return res.status(403).end();
+  const isMobile=key===version.mobileFile || version.pages.some(page=>page.variant==='MOBILE');
+  if(isMobile && !version.mobileEnabled)return res.status(403).end();
  }
  const bytes=await readFile(file);res.setHeader('Content-Type',key.endsWith('.pdf')?'application/pdf':key.endsWith('.png')?'image/png':'image/jpeg');
- if(key.endsWith('.pdf'))res.setHeader('Content-Disposition',`attachment; filename*=UTF-8''${encodeURIComponent(version.document.name)}`);
+ if(key.endsWith('.pdf'))res.setHeader('Content-Disposition',`attachment; filename*=UTF-8''${encodeURIComponent(key===version.mobileFile?(version.mobileName || 'Mobile deck.pdf'):version.document.name)}`);
  return res.send(bytes);
  }catch(error){console.error('Local file request failed');return res.status(400).json({message:'File unavailable'});}
 }

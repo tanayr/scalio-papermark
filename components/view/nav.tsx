@@ -84,8 +84,8 @@ export default function Nav({
     >
       <div className="mx-auto px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
-          <div className="flex flex-1 justify-start items-center">
-            <div className="flex flex-shrink-0 items-center relative h-8 w-36">
+          <div className="flex min-w-0 flex-1 justify-start items-center gap-2">
+            <div className="flex flex-shrink-0 items-center relative h-8 w-24 sm:w-36">
               {brand && brand.logo ? (
                 <Image
                   className="object-contain"
@@ -116,10 +116,10 @@ export default function Nav({
                       Home
                     </BreadcrumbLink>
                   </BreadcrumbItem>
-                  <BreadcrumbSeparator>
+                  <BreadcrumbSeparator className="hidden md:block">
                     <Slash />
                   </BreadcrumbSeparator>
-                  <BreadcrumbItem>
+                  <BreadcrumbItem className="hidden md:block">
                     <BreadcrumbPage
                       className="font-medium"
                       style={{
@@ -136,7 +136,7 @@ export default function Nav({
               </Breadcrumb>
             ) : null}
           </div>
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 space-x-4">
+          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 space-x-1 sm:space-x-4">
             {embeddedLinks && embeddedLinks.length > 0 ? (
               <DropdownMenu>
                 <DropdownMenuTrigger>

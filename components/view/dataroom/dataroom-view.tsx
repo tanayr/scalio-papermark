@@ -1,3 +1,4 @@
+import { prefersMobilePdf } from "@/lib/document-variant";
 import React, { useEffect, useRef, useState } from "react";
 import AccessForm, {
   DEFAULT_ACCESS_FORM_DATA,
@@ -18,6 +19,8 @@ import { LinkWithDataroom } from "@/pages/view/d/[linkId]";
 import { NotionPage } from "@/components/NotionPage";
 
 export type DEFAULT_DOCUMENT_VIEW_TYPE = {
+  variant?: "DESKTOP" | "MOBILE";
+  versionNumber?: number;
   viewId: string;
   dataroomViewId?: string;
   file: string | null;
@@ -85,6 +88,7 @@ export default function DataroomView({
       },
       body: JSON.stringify({
         ...data,
+        preferMobile: prefersMobilePdf(),
         email: data.email || verifiedEmail || userEmail,
         linkId: link.id,
         documentId: documentData?.id,
@@ -110,7 +114,7 @@ export default function DataroomView({
         setVerificationRequested(true);
         setIsLoading(false);
       } else {
-        const { viewId, file, pages, notionData } =
+        const { viewId, file, pages, notionData, variant, versionNumber } =
           fetchData as DEFAULT_DOCUMENT_VIEW_TYPE;
         plausible("dataroomViewed"); // track the event
         analytics.identify(
@@ -126,6 +130,8 @@ export default function DataroomView({
         });
         setViewData((prev) => ({
           viewId,
+          variant,
+          versionNumber,
           dataroomViewId:
             viewType === "DATAROOM_VIEW" ? viewId : prev.dataroomViewId,
           file,
@@ -218,22 +224,24 @@ export default function DataroomView({
 
   if (submitted && documentData) {
     return viewData.notionData?.recordMap ? (
-      <div className="bg-gray-950">
+      <div className="min-h-dvh bg-gray-950">
         <NotionPage
           recordMap={viewData.notionData.recordMap}
           viewId={viewData.viewId}
           linkId={link.id}
           documentId={documentData.id}
           documentName={documentData.name}
-          versionNumber={documentData.documentVersionNumber}
+          versionNumber={viewData.versionNumber ?? documentData.documentVersionNumber}
           brand={brand}
           dataroomId={dataroom.id}
           setDocumentData={setDocumentData}
         />
       </div>
     ) : viewData.pages ? (
-      <div className="bg-gray-950">
+      <div className="min-h-dvh bg-gray-950">
         <PagesViewer
+          key={viewData.viewId}
+          variant={viewData.variant}
           pages={viewData.pages}
           viewId={viewData.viewId}
           linkId={link.id}
@@ -242,7 +250,7 @@ export default function DataroomView({
           allowDownload={link.allowDownload!}
           feedbackEnabled={link.enableFeedback!}
           screenshotProtectionEnabled={link.enableScreenshotProtection!}
-          versionNumber={documentData.documentVersionNumber}
+          versionNumber={viewData.versionNumber ?? documentData.documentVersionNumber}
           brand={brand}
           dataroomId={dataroom.id}
           setDocumentData={setDocumentData}
@@ -253,7 +261,7 @@ export default function DataroomView({
 
   if (submitted && !documentData) {
     return (
-      <div className="bg-gray-950">
+      <div className="min-h-dvh bg-gray-950">
         <DataroomViewer
           brand={brand!}
           viewId={viewData.viewId}
@@ -267,7 +275,7 @@ export default function DataroomView({
   }
 
   return (
-    <div className="bg-gray-950">
+    <div className="min-h-dvh bg-gray-950">
       <div className="h-screen flex items-center justify-center">
         <LoadingSpinner className="h-20 w-20" />
       </div>

@@ -17,6 +17,7 @@ const DEFAULT_PRELOADED_IMAGES_NUM = 10;
 
 export default function PagesViewer({
   pages,
+  variant = "DESKTOP",
   linkId,
   documentId,
   viewId,
@@ -34,6 +35,7 @@ export default function PagesViewer({
   feedback,
 }: {
   pages: { file: string; pageNumber: string; embeddedLinks: string[] }[];
+  variant?: "DESKTOP" | "MOBILE";
   linkId: string;
   documentId: string;
   viewId: string;
@@ -219,14 +221,14 @@ export default function PagesViewer({
         setDocumentData={setDocumentData}
       />
       <div
-        style={{ height: "calc(100vh - 64px)" }}
+        style={{ height: variant === "MOBILE" ? "calc(100dvh - 120px)" : "calc(100dvh - 64px)" }}
         className="flex items-center relative"
       >
         <button
           onClick={goToPreviousPage}
           disabled={pageNumber == 1}
           className={cn(
-            "absolute left-0 h-[calc(100vh - 64px)] px-2 py-24 z-20",
+            variant === "MOBILE" ? "absolute left-3 top-full mt-2 z-20" : "absolute left-0 h-full px-2 py-24 z-20",
             pageNumber == 1 && "hidden",
           )}
         >
@@ -242,7 +244,7 @@ export default function PagesViewer({
           onClick={goToNextPage}
           disabled={pageNumber >= numPagesWithFeedback}
           className={cn(
-            "absolute right-0 h-[calc(100vh - 64px)] px-2 py-24 z-20",
+            variant === "MOBILE" ? "absolute right-3 top-full mt-2 z-20" : "absolute right-0 h-full px-2 py-24 z-20",
             pageNumber >= numPagesWithFeedback && "hidden",
           )}
         >

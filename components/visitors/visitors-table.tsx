@@ -145,6 +145,7 @@ export default function VisitorsTable({ numPages }: { numPages: number }) {
                               </p>
                               <p className="text-xs sm:text-sm text-muted-foreground/60">
                                 {view.link.name ? view.link.name : view.linkId}
+                                {view.variant === "MOBILE" ? " · Mobile PDF" : ""}
                               </p>
                             </div>
                           </div>
@@ -189,7 +190,7 @@ export default function VisitorsTable({ numPages }: { numPages: number }) {
                             <VisitorChart
                               documentId={view.documentId!}
                               viewId={view.id}
-                              totalPages={numPages}
+                              totalPages={view.numPages ?? numPages}
                             />
                           </TableCell>
                         </TableRow>

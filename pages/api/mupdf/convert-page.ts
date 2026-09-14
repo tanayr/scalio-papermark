@@ -102,7 +102,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     // Check if a documentPage with the same pageNumber and versionId already exists
     const existingPage = await prisma.documentPage.findUnique({
       where: {
-        pageNumber_versionId: {
+        pageNumber_versionId_variant: {
+          variant: "DESKTOP",
           pageNumber: pageNumber,
           versionId: documentVersionId,
         },

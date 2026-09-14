@@ -1,3 +1,4 @@
+import MobilePdfCard from "@/components/documents/mobile-pdf-card";
 import { useDocument, useDocumentLinks } from "@/lib/swr/use-document";
 import ErrorPage from "next/error";
 import AppLayout from "@/components/layouts/app";
@@ -59,10 +60,12 @@ export default function DocumentPage() {
               ]}
             /> */}
 
+            <MobilePdfCard key={primaryVersion.id} version={primaryVersion} teamId={teamInfo?.currentTeam?.id!} />
+
             {/* Stats */}
             <StatsComponent
               documentId={prismaDocument.id}
-              numPages={primaryVersion.numPages!}
+              numPages={Math.max(primaryVersion.numPages || 0, primaryVersion.mobileNumPages || 0)}
             />
 
             {/* Links */}

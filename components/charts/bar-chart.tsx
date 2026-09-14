@@ -37,8 +37,8 @@ const transformData = (data: Data[]): TransformedData[] => {
   return data.reduce((acc, { pageNumber, data }) => {
     const transformedItem: Partial<TransformedData> = { pageNumber };
 
-    data.forEach(({ versionNumber, avg_duration }) => {
-      transformedItem[`Version ${versionNumber}`] = avg_duration;
+    data.forEach(({ versionNumber, variant, avg_duration }) => {
+      transformedItem[`Version ${versionNumber} · ${variant === "MOBILE" ? "Mobile" : "Desktop"}`] = avg_duration;
     });
 
     acc.push(transformedItem as TransformedData);

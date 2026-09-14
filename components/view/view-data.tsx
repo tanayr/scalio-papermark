@@ -31,11 +31,13 @@ export default function ViewData({
       viewId={viewData.viewId}
       linkId={link.id}
       documentId={document.id}
-      versionNumber={document.versions[0].versionNumber}
+      versionNumber={viewData.versionNumber ?? document.versions[0].versionNumber}
       brand={brand}
     />
   ) : viewData.pages ? (
     <PagesViewer
+      key={viewData.viewId}
+      variant={viewData.variant}
       pages={viewData.pages}
       viewId={viewData.viewId}
       linkId={link.id}
@@ -44,7 +46,7 @@ export default function ViewData({
       allowDownload={link.allowDownload!}
       feedbackEnabled={link.enableFeedback!}
       screenshotProtectionEnabled={link.enableScreenshotProtection!}
-      versionNumber={document.versions[0].versionNumber}
+      versionNumber={viewData.versionNumber ?? document.versions[0].versionNumber}
       brand={brand}
       showPoweredByBanner={showPoweredByBanner}
       enableQuestion={link.enableQuestion}
@@ -59,7 +61,7 @@ export default function ViewData({
       name={document.name}
       allowDownload={link.allowDownload}
       assistantEnabled={document.assistantEnabled}
-      versionNumber={document.versions[0].versionNumber}
+      versionNumber={viewData.versionNumber ?? document.versions[0].versionNumber}
     />
   );
 }

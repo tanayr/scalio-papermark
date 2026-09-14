@@ -1,3 +1,4 @@
+import { prefersMobilePdf } from "@/lib/document-variant";
 import React, { useEffect, useRef, useState } from "react";
 import AccessForm, {
   DEFAULT_ACCESS_FORM_DATA,
@@ -15,6 +16,8 @@ import { useRouter } from "next/router";
 import { useAnalytics } from "@/lib/analytics";
 
 export type DEFAULT_DOCUMENT_VIEW_TYPE = {
+  variant?: "DESKTOP" | "MOBILE";
+  versionNumber?: number;
   viewId: string;
   file: string | null;
   pages: { file: string; pageNumber: string; embeddedLinks: string[] }[] | null;
@@ -73,6 +76,7 @@ export default function DocumentView({
       },
       body: JSON.stringify({
         ...data,
+        preferMobile: prefersMobilePdf(),
         email: data.email || verifiedEmail || userEmail,
         linkId: link.id,
         documentId: document.id,
@@ -93,7 +97,7 @@ export default function DocumentView({
         setVerificationRequested(true);
         setIsLoading(false);
       } else {
-        const { viewId, file, pages } = fetchData as DEFAULT_DOCUMENT_VIEW_TYPE;
+        const { viewId, file, pages, variant, versionNumber } = fetchData as DEFAULT_DOCUMENT_VIEW_TYPE;
         plausible("documentViewed"); // track the event
         analytics.identify(
           userEmail ?? verifiedEmail ?? data.email ?? undefined,
@@ -104,7 +108,7 @@ export default function DocumentView({
           viewerId: viewId,
           viewerEmail: data.email || verifiedEmail || userEmail,
         });
-        setViewData({ viewId, file, pages });
+        setViewData({ viewId, file, pages, variant, versionNumber });
         setSubmitted(true);
         setVerificationRequested(false);
         setIsLoading(false);
@@ -168,7 +172,7 @@ export default function DocumentView({
     );
   }
   return (
-    <div className="bg-gray-950">
+    <div className="min-h-dvh bg-gray-950">
       {submitted ? (
         <ViewData
           link={link}
