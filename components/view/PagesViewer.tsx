@@ -56,6 +56,15 @@ export default function PagesViewer({
   } | null;
 }) {
   const router = useRouter();
+  const [smallScreen, setSmallScreen] = useState(false);
+  const compact = variant === "MOBILE" || smallScreen;
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 767px)");
+    const update = () => setSmallScreen(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
   const numPages = pages.length;
   const numPagesWithFeedback =
     enableQuestion && feedback ? numPages + 1 : numPages;
@@ -230,7 +239,7 @@ export default function PagesViewer({
 
   return (
     <>
-      <Nav
+      {!compact && <Nav
         pageNumber={pageNumber}
         numPages={numPagesWithFeedback}
         assistantEnabled={assistantEnabled}
@@ -242,16 +251,16 @@ export default function PagesViewer({
         embeddedLinks={pages[pageNumber - 1]?.embeddedLinks}
         isDataroom={dataroomId ? true : false}
         setDocumentData={setDocumentData}
-      />
+      />}
       <div
-        style={{ height: variant === "MOBILE" ? "calc(100dvh - 120px)" : "calc(100dvh - 64px)" }}
+        style={{ height: compact ? `calc(100dvh - ${feedbackEnabled ? 112 : 64}px - env(safe-area-inset-bottom))` : "calc(100dvh - 64px)" }}
         className="flex items-center relative"
       >
         <button
           onClick={goToPreviousPage}
           disabled={pageNumber == 1}
           className={cn(
-            variant === "MOBILE" ? "absolute left-3 top-full mt-2 z-20" : "absolute left-0 h-full px-2 py-24 z-20",
+            compact ? "hidden" : "absolute left-0 h-full px-2 py-24 z-20",
             pageNumber == 1 && "hidden",
           )}
         >
@@ -267,7 +276,7 @@ export default function PagesViewer({
           onClick={goToNextPage}
           disabled={pageNumber >= numPagesWithFeedback}
           className={cn(
-            variant === "MOBILE" ? "absolute right-3 top-full mt-2 z-20" : "absolute right-0 h-full px-2 py-24 z-20",
+            compact ? "hidden" : "absolute right-0 h-full px-2 py-24 z-20",
             pageNumber >= numPagesWithFeedback && "hidden",
           )}
         >
@@ -340,11 +349,24 @@ export default function PagesViewer({
           ) : null}
         </div>
         {feedbackEnabled && pageNumber !== numPagesWithFeedback ? (
-          <Toolbar viewId={viewId} pageNumber={pageNumber} />
+          <Toolbar viewId={viewId} pageNumber={pageNumber} compact={compact} />
         ) : null}
         {screenshotProtectionEnabled ? <ScreenProtector /> : null}
         {showPoweredByBanner ? <PoweredBy linkId={linkId} /> : null}
       </div>
+      {compact && (
+        <nav aria-label="Page navigation" className="fixed inset-x-0 bottom-0 z-20 bg-[#f7f4ee] text-gray-900" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+          <div className="grid h-16 grid-cols-3 items-center px-3">
+            <button aria-label="Previous" onClick={goToPreviousPage} disabled={pageNumber <= 1} className="flex h-12 w-12 items-center justify-center rounded-full disabled:opacity-25">
+              <ChevronLeftIcon className="h-7 w-7" />
+            </button>
+            <span role="status" aria-live="polite" className="text-center text-sm font-medium tabular-nums">{pageNumber} / {numPagesWithFeedback}</span>
+            <button aria-label="Next" onClick={goToNextPage} disabled={pageNumber >= numPagesWithFeedback} className="flex h-12 w-12 items-center justify-center justify-self-end rounded-full disabled:opacity-25">
+              <ChevronRightIcon className="h-7 w-7" />
+            </button>
+          </div>
+        </nav>
+      )}
     </>
   );
 }

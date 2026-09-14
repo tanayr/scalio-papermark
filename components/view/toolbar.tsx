@@ -6,9 +6,11 @@ import Draggable from "react-draggable";
 export default function Toolbar({
   viewId,
   pageNumber,
+  compact = false,
 }: {
   viewId: string;
   pageNumber: number;
+  compact?: boolean;
 }) {
   const [currentEmoji, setCurrentEmoji] = useState<{
     emoji: string;
@@ -80,11 +82,11 @@ export default function Toolbar({
   return (
     <>
       <div
-        className="pointer-events-none fixed top-16 left-0 w-dvw justify-center items-end flex z-10"
-        style={{ height: "calc(100vh - 64px)" }}
+        className="pointer-events-none fixed left-0 w-dvw justify-center items-end flex z-10"
+        style={compact ? { top: 0, bottom: "calc(64px + env(safe-area-inset-bottom))" } : { top: 64, height: "calc(100vh - 64px)" }}
       >
         <Draggable bounds="parent" handle=".moveable-icon">
-          <div className="pointer-events-auto bg-gray-950/40 rounded-full w-max mt-4 mb-4">
+          <div className={`pointer-events-auto bg-gray-950/40 rounded-full w-max ${compact ? "mb-1" : "mt-4 mb-4"}`}>
             <div className="grid items-center justify-start">
               <div className="px-2 py-1">
                 <div className="grid items-center justify-start grid-flow-col">
